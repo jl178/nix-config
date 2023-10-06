@@ -2,10 +2,10 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
-  imports =
+  imports = with inputs.self.nixosModules;
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
@@ -14,7 +14,22 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = {
+      inherit inputs;
+      headless = false;
+    };
+  };
 
+  nix = {
+    # From flake-utils-plus
+    generateNixPathFromInputs = true;
+    generateRegistryFromInputs = true;
+    linkInputs = true;
+  };
 
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -30,7 +45,7 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     jetbrains-mono
   ];
   # console = {
@@ -55,7 +70,7 @@
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-    nvidiaPatches = true;
+    enableNvidiaPatches = true;
   };
   
   programs.zsh.enable = true;
