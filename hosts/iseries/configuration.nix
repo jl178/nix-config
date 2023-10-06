@@ -18,6 +18,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    users = import "${inputs.self}/users";
     extraSpecialArgs = {
       inherit inputs;
       headless = false;

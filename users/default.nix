@@ -1,0 +1,3 @@
+{
+  jered = import ./jered;
+}
