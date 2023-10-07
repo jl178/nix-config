@@ -19,7 +19,7 @@ monitor=,preferred,auto,auto
 # See https://wiki.hyprland.org/Configuring/Keywords/ for more
 
 #TODO: Can't get waybar working with NixOS natively.
-exec-once = waybar
+# exec-once = waybar
 #TODO: Cannot get background working with NixOS natively.
 exec = swaybg -m fill -i ~/.background-image
 

@@ -131,6 +131,7 @@
      wezterm
      swww
      tmux
+     swaybg
      zsh	
      #TODO: Move to home manager for below packages.
      zsh-autocomplete
