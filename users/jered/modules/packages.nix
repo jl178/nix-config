@@ -2,10 +2,10 @@
 {
   imports = [
   ];
+  # General packages which are used across various programs.
   home = {
       packages = with pkgs; [
         btop
-        tmux
         htop
         # gcc
         clang
