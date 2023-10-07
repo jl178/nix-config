@@ -29,7 +29,7 @@
             }
 
             #workspaces button {
-                padding: 5px;
+                padding: 2px;
                 color: #504945; /* bg3 */
                 margin-right: 5px;
             }
@@ -73,7 +73,7 @@
             #workspaces,
             #tray,
             #backlight {
-                background: #3c3836; /* bg2 */
+                background: rgba(60,56,54, .7); /* bg2 */
                 opacity: 0.8;
                 padding: 0px 10px;
                 margin: 3px 0px;
@@ -99,9 +99,9 @@
             }
 
             #workspaces {
-                background: #3c3836; /* bg2 */
+                background: rgba(60,56,54, .7); /* bg2 */
                 border-radius: 10px;
-                margin-left: 10px;
+                margin-left: 5px;
                 padding-right: 0px;
                 padding-left: 5px;
             }
@@ -192,7 +192,7 @@
           position = "top";
           tray = { spacing = 10; };
           modules-center = [ "hyprland/window" ];
-          modules-left = [ "custom/nix" "clock" ];
+          modules-left = [ "custom/nix" "clock" "hyprland/workspaces" ];
           modules-right = [
             "network"
             "bluetooth"
@@ -205,6 +205,12 @@
           ++ [
             "tray"
           ];
+          "hyprland/workspaces" = {
+             format = "";
+             format-alt = "";
+             on-scroll-up = "hyprctl dispatch workspace e+1";
+             on-scroll-down = "hyprctl dispatch workspace e-1";
+          };
           battery = {
             format = "{capacity}% {icon}";
             format-alt = "{time} {icon}";
