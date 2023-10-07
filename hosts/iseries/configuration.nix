@@ -134,6 +134,7 @@
      swaybg
      pavucontrol
      zsh
+     steam-run
    ];
    environment.sessionVariables = {
      XDG_CURRENT_DESKTOP = "Hyprland";
