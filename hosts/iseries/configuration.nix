@@ -48,6 +48,7 @@
   i18n.defaultLocale = "en_US.UTF-8";
   fonts.packages = with pkgs; [
     jetbrains-mono
+    font-awesome
   ];
   # console = {
   #   font = "Lat2-Terminus16";
