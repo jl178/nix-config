@@ -7,18 +7,15 @@
   # refactor.
   # https://discourse.nixos.org/t/conditionally-import-module-if-it-exists/17832/2
   # https://github.com/jonringer/nixpkgs-config/blob/cc2958b5e0c8147849c66b40b55bf27ff70c96de/flake.nix#L47-L82
-  imports = [ ./modules/packages.nix ./modules/tmux.nix ] ++ lib.optional (!headless) ./desktop.nix;
+  imports = [ ./modules/packages.nix ./modules/tmux.nix ]
+    ++ lib.optional (!headless) ./desktop.nix;
 
   manual.manpages.enable = false;
 
   home = {
     username = "jered";
     homeDirectory = "/home/jered";
-    packages = with pkgs; [
-      zsh
-      git
-      gh
-    ];
+    packages = with pkgs; [ zsh git gh ];
   };
 
   programs.git = {
@@ -54,7 +51,8 @@
       gd = "git diff * | bat";
       gl = "git log --stat --graph --decorate --oneline";
       b = "bat";
-      rr = "ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd \"$LASTDIR\"";
+      rr = ''
+        ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'';
       diff = "diff --color=auto";
       grep = "grep --color=auto";
       ip = "ip --color=auto";

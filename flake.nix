@@ -13,21 +13,11 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    utils = {
-      url = "github:gytis-ivaskevicius/flake-utils-plus";
-    };
+    utils = { url = "github:gytis-ivaskevicius/flake-utils-plus"; };
   };
 
-  outputs =
-    { self
-    , home-manager
-    , nixpkgs
-    , nixpkgs2305
-    , agenix
-    , nixos-hardware
-    , utils
-    , ...
-    } @ inputs: {
+  outputs = { self, home-manager, nixpkgs, nixpkgs2305, agenix, nixos-hardware
+    , utils, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
         iseries = nixpkgs.lib.nixosSystem {

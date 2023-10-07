@@ -1,12 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  home = {
-    packages = with pkgs; [
-      tmux
-      zsh
-    ];
-  };
+  home = { packages = with pkgs; [ tmux zsh ]; };
   programs.tmux = {
     enable = true;
     plugins = with pkgs; [

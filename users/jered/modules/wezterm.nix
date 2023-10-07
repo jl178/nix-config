@@ -1,12 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  home = {
-    packages = with pkgs; [
-      jetbrains-mono
-      wezterm
-    ];
-  };
+  home = { packages = with pkgs; [ jetbrains-mono wezterm ]; };
   programs.wezterm = {
     enable = true;
 
@@ -20,8 +15,26 @@
         selection_bg = "#D4BE98";
         selection_fg = "#3C3836";
 
-        ansi = [ "#1d2021" "#ea6962" "#a9b665" "#d8a657" "#7daea3" "#d3869b" "#89b482" "#d4be98" ];
-        brights = [ "#eddeb5" "#ea6962" "#a9b665" "#d8a657" "#7daea3" "#d3869b" "#89b482" "#d4be98" ];
+        ansi = [
+          "#1d2021"
+          "#ea6962"
+          "#a9b665"
+          "#d8a657"
+          "#7daea3"
+          "#d3869b"
+          "#89b482"
+          "#d4be98"
+        ];
+        brights = [
+          "#eddeb5"
+          "#ea6962"
+          "#a9b665"
+          "#d8a657"
+          "#7daea3"
+          "#d3869b"
+          "#89b482"
+          "#d4be98"
+        ];
       };
     };
 

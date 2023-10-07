@@ -1,190 +1,191 @@
 { config, pkgs, inputs, ... }:
 
-{ config = {
-  home-manager.users.jered = { pkgs, ... }: {
-  programs.waybar = {
+{
+  config = {
+    home-manager.users.jered = { pkgs, ... }: {
+      programs.waybar = {
         enable = true;
         systemd.enable = true;
         style = ''
-            * {
-                border: none;
-                border-radius: 0;
-                font-family: "JetBrainsMono Nerd Font Bold";
-                font-weight: bold;
-                font-size: 13px;
-                min-height: 0;
-            }
+          * {
+              border: none;
+              border-radius: 0;
+              font-family: "JetBrainsMono Nerd Font Bold";
+              font-weight: bold;
+              font-size: 13px;
+              min-height: 0;
+          }
 
-            window#waybar {
-                background: rgba(29, 32, 33, 0);
-                color: #d4be98; /* bg1 */
-            }
+          window#waybar {
+              background: rgba(29, 32, 33, 0);
+              color: #d4be98; /* bg1 */
+          }
 
-            tooltip {
-                background: #3c3836; /* bg2 */
-                border-radius: 10px;
-                border-width: 2px;
-                border-style: solid;
-                border-color: #282828; /* bg0 */
-            }
+          tooltip {
+              background: #3c3836; /* bg2 */
+              border-radius: 10px;
+              border-width: 2px;
+              border-style: solid;
+              border-color: #282828; /* bg0 */
+          }
 
-            #workspaces button {
-                padding: 2px;
-                color: #504945; /* bg3 */
-                margin-right: 5px;
-            }
+          #workspaces button {
+              padding: 2px;
+              color: #504945; /* bg3 */
+              margin-right: 5px;
+          }
 
-            #workspaces button.active {
-                color: #d4be98; /* bg1 */
-            }
+          #workspaces button.active {
+              color: #d4be98; /* bg1 */
+          }
 
-            #workspaces button.focused {
-                color: #d4be98; /* bg1 */
-                background: #cc241d; /* red */
-                border-radius: 10px;
-            }
+          #workspaces button.focused {
+              color: #d4be98; /* bg1 */
+              background: #cc241d; /* red */
+              border-radius: 10px;
+          }
 
-            #workspaces button.urgent {
-                color: #282828; /* bg0 */
-                background: #98971a; /* yellow */
-                border-radius: 10px;
-            }
+          #workspaces button.urgent {
+              color: #282828; /* bg0 */
+              background: #98971a; /* yellow */
+              border-radius: 10px;
+          }
 
-            #workspaces button:hover {
-                background: #282828; /* bg0 */
-                color: #d4be98; /* bg1 */
-                border-radius: 10px;
-            }
+          #workspaces button:hover {
+              background: #282828; /* bg0 */
+              color: #d4be98; /* bg1 */
+              border-radius: 10px;
+          }
 
-            /* Repeating modules */
+          /* Repeating modules */
 
-            #custom-power_profile,
-            #custom-weather,
-            #window,
-            #clock,
-            #battery,
-            #pulseaudio,
-            #network,
-            #cpu,
-            #memory,
-            #custom-nix,
-            #bluetooth,
-            #temperature,
-            #workspaces,
-            #tray,
-            #backlight {
-                background: rgba(60,56,54, .7); /* bg2 */
-                opacity: 0.8;
-                padding: 0px 10px;
-                margin: 3px 0px;
-                margin-top: 10px;
-                border: 1px solid #282828; /* bg0 */
-            }
+          #custom-power_profile,
+          #custom-weather,
+          #window,
+          #clock,
+          #battery,
+          #pulseaudio,
+          #network,
+          #cpu,
+          #memory,
+          #custom-nix,
+          #bluetooth,
+          #temperature,
+          #workspaces,
+          #tray,
+          #backlight {
+              background: rgba(60,56,54, .7); /* bg2 */
+              opacity: 0.8;
+              padding: 0px 10px;
+              margin: 3px 0px;
+              margin-top: 10px;
+              border: 1px solid #282828; /* bg0 */
+          }
 
-            #temperature {
-                border-radius: 10px 0px 0px 10px;
-            }
+          #temperature {
+              border-radius: 10px 0px 0px 10px;
+          }
 
-            #temperature.critical {
-                color: #cc241d; /* red */
-            }
+          #temperature.critical {
+              color: #cc241d; /* red */
+          }
 
-            #backlight {
-                border-radius: 10px 0px 0px 10px;
-            }
+          #backlight {
+              border-radius: 10px 0px 0px 10px;
+          }
 
-            #tray {
-                border-radius: 10px;
-                margin-right: 10px;
-            }
+          #tray {
+              border-radius: 10px;
+              margin-right: 10px;
+          }
 
-            #workspaces {
-                background: rgba(60,56,54, .7); /* bg2 */
-                border-radius: 10px;
-                margin-left: 5px;
-                padding-right: 0px;
-                padding-left: 5px;
-            }
+          #workspaces {
+              background: rgba(60,56,54, .7); /* bg2 */
+              border-radius: 10px;
+              margin-left: 5px;
+              padding-right: 0px;
+              padding-left: 5px;
+          }
 
-            #custom-power_profile {
-                color: #98971a; /* yellow */
-                border-left: 0px;
-                border-right: 0px;
-            }
+          #custom-power_profile {
+              color: #98971a; /* yellow */
+              border-left: 0px;
+              border-right: 0px;
+          }
 
-            #window {
-                border-radius: 10px;
-                margin-left: 60px;
-                margin-right: 60px;
-            }
+          #window {
+              border-radius: 10px;
+              margin-left: 60px;
+              margin-right: 60px;
+          }
 
-            #custom-nix {
-                font-family: "JetBrainsMono Nerd Font Bold";
-                font-size: 25px;
-                color: #83a598; /* yellow */
-                border-radius: 10px 0px 0px 10px;
-                border-left: 0px;
-                border-right: 0px;
-            }
+          #custom-nix {
+              font-family: "JetBrainsMono Nerd Font Bold";
+              font-size: 25px;
+              color: #83a598; /* yellow */
+              border-radius: 10px 0px 0px 10px;
+              border-left: 0px;
+              border-right: 0px;
+          }
 
-            #clock {
-                color: #d79921;
-                border-radius: 0px 10px 10px 0px;
-                margin-right: 10px;
-            }
+          #clock {
+              color: #d79921;
+              border-radius: 0px 10px 10px 0px;
+              margin-right: 10px;
+          }
 
-            #network {
-                color: #d79921; /* yellow */
-                border-radius: 10px 0px 0px 10px;
-                border-left: 0px;
-                border-right: 0px;
-            }
+          #network {
+              color: #d79921; /* yellow */
+              border-radius: 10px 0px 0px 10px;
+              border-left: 0px;
+              border-right: 0px;
+          }
 
-            #cpu {
-                color: #d79921; /* yellow */
-                border-left: 0px;
-                border-right: 0px;
-            }
+          #cpu {
+              color: #d79921; /* yellow */
+              border-left: 0px;
+              border-right: 0px;
+          }
 
-            #memory {
-                color: #d79921; /* yellow */
-                border-radius: 0px 10px 10px 0px;
-                margin-right: 10px;
+          #memory {
+              color: #d79921; /* yellow */
+              border-radius: 0px 10px 10px 0px;
+              margin-right: 10px;
 
-            }
+          }
 
-            #bluetooth {
-                color: #83a598; /* green */
-                border-radius: 0px 10px 10px 0px;
-                margin-right: 10px;
-            }
+          #bluetooth {
+              color: #83a598; /* green */
+              border-radius: 0px 10px 10px 0px;
+              margin-right: 10px;
+          }
 
-            #pulseaudio {
-                color: #83a598; /* green */
-                border-left: 0px;
-                border-right: 0px;
-            }
+          #pulseaudio {
+              color: #83a598; /* green */
+              border-left: 0px;
+              border-right: 0px;
+          }
 
-            #pulseaudio.microphone {
-                color: #d3869b; /* pink */
-                border-left: 0px;
-                border-right: 0px;
-                border-radius: 0px 10px 10px 0px;
-                margin-right: 10px;
-            }
+          #pulseaudio.microphone {
+              color: #d3869b; /* pink */
+              border-left: 0px;
+              border-right: 0px;
+              border-radius: 0px 10px 10px 0px;
+              margin-right: 10px;
+          }
 
-            #battery {
-                color: #8ec07c; /* green */
-                border-radius: 0 10px 10px 0;
-                margin-right: 10px;
-                border-left: 0px;
-            }
+          #battery {
+              color: #8ec07c; /* green */
+              border-radius: 0 10px 10px 0;
+              margin-right: 10px;
+              border-left: 0px;
+          }
 
-            #custom-weather {
-                border-radius: 0px 10px 10px 0px;
-                border-right: 0px;
-                margin-left: 0px;
-            }
+          #custom-weather {
+              border-radius: 0px 10px 10px 0px;
+              border-right: 0px;
+              margin-left: 0px;
+          }
         '';
         settings = [{
           height = 50;
@@ -202,14 +203,12 @@
             "cpu"
             "memory"
           ] # ++ (if config.hostId == "system76" then [ "battery" ] else [ ])
-          ++ [
-            "tray"
-          ];
+            ++ [ "tray" ];
           "hyprland/workspaces" = {
-             format = "";
-             format-alt = "";
-             on-scroll-up = "hyprctl dispatch workspace e+1";
-             on-scroll-down = "hyprctl dispatch workspace e-1";
+            format = "";
+            format-alt = "";
+            on-scroll-up = "hyprctl dispatch workspace e+1";
+            on-scroll-down = "hyprctl dispatch workspace e-1";
           };
           battery = {
             format = "{capacity}% {icon}";
@@ -223,9 +222,9 @@
             };
           };
           "custom/nix" = {
-              format = "󱄅";
-              tooltip-format = "NixOS";
-              on-click = "wezterm";
+            format = "󱄅";
+            tooltip-format = "NixOS";
+            on-click = "wezterm";
           };
           bluetooth = {
             format = " {status}";
@@ -250,7 +249,8 @@
             interval = 1;
             format-alt = "{ifname}: {ipaddr}/{cidr}";
             format-disconnected = "Disconnected ⚠";
-            format-ethernet = "{ifname}: {ipaddr}/{cidr}   up: {bandwidthUpBits} down: {bandwidthDownBits}";
+            format-ethernet =
+              "{ifname}: {ipaddr}/{cidr}   up: {bandwidthUpBits} down: {bandwidthDownBits}";
             format-linked = "{ifname} (No IP) ";
             format-wifi = "{essid} ({signalStrength}%) ";
           };

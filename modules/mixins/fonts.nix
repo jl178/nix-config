@@ -1,8 +1,4 @@
-{ config, pkgs, lib, ... }:
-{
+{ config, pkgs, lib, ... }: {
   fonts.enableDefaultPackages = true;
-  fonts.packages = with pkgs; [
-    font-awesome
-    nerdfonts
-  ];
+  fonts.packages = with pkgs; [ font-awesome nerdfonts ];
 }

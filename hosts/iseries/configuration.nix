@@ -5,13 +5,12 @@
 { config, pkgs, inputs, ... }:
 
 {
-  imports = with inputs.self.nixosModules;
-    [
-      ./hardware-configuration.nix
-      mixins-fonts
-      mixins-hyprland
-      mixins-waybar
-    ];
+  imports = with inputs.self.nixosModules; [
+    ./hardware-configuration.nix
+    mixins-fonts
+    mixins-hyprland
+    mixins-waybar
+  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -38,8 +37,9 @@
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
-  networking.nameservers = ["8.8.8.8"];
+  networking.networkmanager.enable =
+    true; # Easiest to use and most distros use this by default.
+  networking.nameservers = [ "8.8.8.8" ];
   # Set your time zone.
   time.timeZone = "America/Denver";
 
@@ -57,7 +57,7 @@
   nixpkgs.config.allowUnfree = true;
   services.xserver = {
     enable = true;
-    videoDrivers = ["nvidia"];
+    videoDrivers = [ "nvidia" ];
     displayManager.gdm = {
       enable = true;
       wayland = true;
@@ -73,21 +73,17 @@
     xwayland.enable = true;
     enableNvidiaPatches = true;
   };
-  programs.waybar = {
-    enable = true;
-  };
+  programs.waybar = { enable = true; };
 
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
 
   # Enable the X11 windowing system.
- # services.xserver.enable = true;
-
+  # services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
-
 
   # Configure keymap in X11
   # services.xserver.layout = "us";
@@ -102,14 +98,13 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
   # Ensure the 'nixosgroup' exists
-  users.groups.nixosgroup = {};
+  users.groups.nixosgroup = { };
 
   # Activation script to recursively set permissions using chmod
   system.activationScripts.setPermissions = {
@@ -119,29 +114,30 @@
     '';
   };
   users.users.jered = {
-     isNormalUser = true;
-     extraGroups = [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
+    isNormalUser = true;
+    extraGroups =
+      [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
   };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-   environment.systemPackages = with pkgs; [
-     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-     killall
-     git
-     kitty
-     wezterm
-     swaybg
-     pavucontrol
-     zsh
-     steam-run
-   ];
-   environment.sessionVariables = {
-     XDG_CURRENT_DESKTOP = "Hyprland";
-     XDG_SESSION_DESKTOP = "Hyprland";
-     WLR_NO_HARDWARE_CURSORS = "1";
-     NIXOS_OZONE_WL = "1";
-   };
+  environment.systemPackages = with pkgs; [
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    killall
+    git
+    kitty
+    wezterm
+    swaybg
+    pavucontrol
+    zsh
+    steam-run
+  ];
+  environment.sessionVariables = {
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    NIXOS_OZONE_WL = "1";
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
