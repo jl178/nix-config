@@ -3,7 +3,6 @@
   # General packages which are used across various programs.
   home = {
     packages = with pkgs; [
-      btop
       htop
       # gcc
       clang

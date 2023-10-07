@@ -7,7 +7,7 @@
   # refactor.
   # https://discourse.nixos.org/t/conditionally-import-module-if-it-exists/17832/2
   # https://github.com/jonringer/nixpkgs-config/blob/cc2958b5e0c8147849c66b40b55bf27ff70c96de/flake.nix#L47-L82
-  imports = [ ./modules/packages.nix ./modules/tmux.nix ]
+  imports = [ ./modules/packages.nix ./modules/tmux.nix ./modules/btop.nix ]
     ++ lib.optional (!headless) ./desktop.nix;
 
   manual.manpages.enable = false;
