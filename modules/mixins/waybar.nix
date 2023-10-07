@@ -9,7 +9,7 @@
             * {
                 border: none;
                 border-radius: 0;
-                font-family: "JetBrainsMono Nerd Font";
+                font-family: "JetBrainsMono Nerd Font Bold";
                 font-weight: bold;
                 font-size: 13px;
                 min-height: 0;
@@ -67,6 +67,7 @@
             #network,
             #cpu,
             #memory,
+            #custom-nix,
             #bluetooth,
             #temperature,
             #workspaces,
@@ -117,9 +118,19 @@
                 margin-right: 60px;
             }
 
+            #custom-nix {
+                font-family: "JetBrainsMono Nerd Font Bold";
+                font-size: 25px;
+                color: #83a598; /* yellow */
+                border-radius: 10px 0px 0px 10px;
+                border-left: 0px;
+                border-right: 0px;
+            }
+
             #clock {
                 color: #d79921;
-                border-radius: 10px;
+                border-radius: 0px 10px 10px 0px;
+                margin-right: 10px;
             }
 
             #network {
@@ -128,11 +139,13 @@
                 border-left: 0px;
                 border-right: 0px;
             }
+
             #cpu {
                 color: #d79921; /* yellow */
                 border-left: 0px;
                 border-right: 0px;
             }
+
             #memory {
                 color: #d79921; /* yellow */
                 border-radius: 0px 10px 10px 0px;
@@ -179,7 +192,7 @@
           position = "top";
           tray = { spacing = 10; };
           modules-center = [ "hyprland/window" ];
-          modules-left = [ "clock" ];
+          modules-left = [ "custom/nix" "clock" ];
           modules-right = [
             "network"
             "bluetooth"
@@ -202,6 +215,11 @@
               critical = 15;
               warning = 30;
             };
+          };
+          "custom/nix" = {
+              format = "󱄅";
+              tooltip-format = "NixOS";
+              on-click = "wezterm";
           };
           bluetooth = {
             format = " {status}";
