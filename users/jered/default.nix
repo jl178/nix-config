@@ -30,6 +30,7 @@
     enableAutosuggestions = true;
     syntaxHighlighting.enable = true;
     shellAliases = {
+      web = "google-chrome-stable &> /dev/null & disown";
       n = "nix-shell -p";
       q = "exit";
       ls = "lsd -Fl";

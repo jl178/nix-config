@@ -6,7 +6,7 @@
     enable = true;
     settings = {
       color_theme = "TTY";
-      theme_background = true;
+      theme_background = false;
     };
   };
 }
