@@ -31,6 +31,18 @@
           ];
           specialArgs = { inherit inputs; };
         };
+        oryp11 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/oryp11/configuration.nix
+            utils.nixosModules.autoGenFromInputs
+            home-manager.nixosModules.home-manager
+            agenix.nixosModules.age
+            # nixos-hardware.nixosModules.common-gpu-nvidia
+          ];
+          specialArgs = { inherit inputs; };
+        };
+
       };
     };
 }
