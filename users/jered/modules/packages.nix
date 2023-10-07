@@ -6,7 +6,6 @@
       packages = with pkgs; [
         btop
         tmux
-        git
         htop
         # gcc
         clang
@@ -23,7 +22,6 @@
         kind
         helm
         jdk11
-        gh
         unzip
         terraform
         ranger

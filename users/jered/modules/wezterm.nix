@@ -1,6 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  home = {
+    packages = with pkgs; [
+      jetbrains-mono
+      wezterm
+    ];
+  };
   programs.wezterm = {
     enable = true;
 

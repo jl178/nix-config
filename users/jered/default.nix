@@ -15,6 +15,9 @@
     username = "jered";
     homeDirectory = "/home/jered";
     packages = with pkgs; [
+      zsh
+      git
+      gh
     ];
   };
 
