@@ -3,6 +3,7 @@
 {
   wayland.windowManager.hyprland = {
     enable = true;
+    xwayland.enable = true;
     extraConfig = ''
 # Setup monitors
 # See https://wiki.hyprland.org/Configuring/Monitors/
@@ -16,6 +17,11 @@ monitor=,preferred,auto,auto
 #monitor=eDP-1,2560x1440@165,2560x0,1
 
 # See https://wiki.hyprland.org/Configuring/Keywords/ for more
+
+#TODO: Can't get waybar working with NixOS natively.
+exec-once = waybar
+#TODO: Cannot get background working with NixOS natively.
+exec = swaybg -m fill -i ~/.background-image
 
 # Source a file (multi-file configs)
 # source = ~/.config/hypr/myColors.conf
@@ -187,6 +193,5 @@ bind = $mainMod, mouse_up, workspace, e-1
 bindm = $mainMod, mouse:272, movewindow
 bindm = $mainMod, mouse:273, resizewindow  
     '';
-    xwayland.enable = true;
   }; 
 }

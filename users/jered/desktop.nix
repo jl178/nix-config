@@ -3,6 +3,7 @@
   imports = [
     # ./modules/wezterm.nix
     ./modules/waybar.nix
+    ./modules/hyprland.nix
   ];
   home = {
     packages = with pkgs; [
