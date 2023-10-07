@@ -6,15 +6,17 @@
 
 {
   imports = with inputs.self.nixosModules;
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
+      mixins-fonts
+      mixins-hyprland
     ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -46,10 +48,6 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  fonts.packages = with pkgs; [
-    jetbrains-mono
-    font-awesome
-  ];
   # console = {
   #   font = "Lat2-Terminus16";
   #   keyMap = "us";
@@ -63,7 +61,7 @@
       enable = true;
       wayland = true;
     };
-    desktopManager.wallpaper.mode = "fill"; 
+    desktopManager.wallpaper.mode = "fill";
   };
   hardware = {
     opengl.enable = true;
@@ -77,7 +75,7 @@
   programs.waybar = {
     enable = true;
   };
-  
+
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
 
@@ -88,7 +86,7 @@
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
-  
+
 
   # Configure keymap in X11
   # services.xserver.layout = "us";
@@ -109,9 +107,19 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
+  # Ensure the 'nixosgroup' exists
+  users.groups.nixosgroup = {};
+
+  # Activation script to recursively set permissions using chmod
+  system.activationScripts.setPermissions = {
+    text = ''
+      chown -R :nixosgroup /etc/nixos/
+      chmod -R 770 /etc/nixos/
+    '';
+  };
   users.users.jered = {
      isNormalUser = true;
-     extraGroups = [ "wheel" "docker" ]; # Enable ‘sudo’ for the user.
+     extraGroups = [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
      packages = with pkgs; [
        google-chrome
        tree
@@ -132,7 +140,7 @@
      swww
      tmux
      swaybg
-     zsh	
+     zsh
      #TODO: Move to home manager for below packages.
      zsh-autocomplete
      zsh-autosuggestions
@@ -198,4 +206,3 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
 }
-

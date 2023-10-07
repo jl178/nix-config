@@ -3,7 +3,7 @@
   imports = [
     # ./modules/wezterm.nix
     ./modules/waybar.nix
-    ./modules/hyprland.nix
+    # ./modules/hyprland.nix
   ];
   home = {
     packages = with pkgs; [
@@ -31,7 +31,7 @@
       package = pkgs.adwaita-qt;
     };
   };
-  
+
   gtk = {
     enable = true;
     theme.package = pkgs.arc-theme;
