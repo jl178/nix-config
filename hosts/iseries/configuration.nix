@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       mixins-fonts
       mixins-hyprland
+      mixins-waybar
     ];
 
   # Use the systemd-boot EFI boot loader.

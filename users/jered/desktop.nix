@@ -2,8 +2,7 @@
 {
   imports = [
     # ./modules/wezterm.nix
-    ./modules/waybar.nix
-    # ./modules/hyprland.nix
+    # ./modules/waybar.nix
   ];
   home = {
     packages = with pkgs; [
