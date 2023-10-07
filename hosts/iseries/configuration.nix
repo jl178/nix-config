@@ -121,10 +121,6 @@
   users.users.jered = {
      isNormalUser = true;
      extraGroups = [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
-     packages = with pkgs; [
-       google-chrome
-       tree
-     ];
   };
 
   # List packages installed in system profile. To search, run:
@@ -133,46 +129,17 @@
      vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
      killall
      git
-     gcc
-     clang
-     cmake
      kitty
      wezterm
-     swww
-     tmux
      swaybg
+     pavucontrol
      zsh
-     #TODO: Move to home manager for below packages.
-     zsh-autocomplete
-     zsh-autosuggestions
-     zsh-autopair
-     zsh-syntax-highlighting
-     git
-     htop
-     xdg-user-dirs
-     lsd
-     neovim
-     python3
-     nodejs_18
-     fzf
-     ripgrep
-     lazygit
-     kubectl
-     k9s
-     kind
-     helm
-     jdk11
-     gh
-     unzip
-     terraform
-     ranger
    ];
    environment.sessionVariables = {
      XDG_CURRENT_DESKTOP = "Hyprland";
      XDG_SESSION_DESKTOP = "Hyprland";
      WLR_NO_HARDWARE_CURSORS = "1";
      NIXOS_OZONE_WL = "1";
-
    };
 
   # Some programs need SUID wrappers, can be configured further or are
