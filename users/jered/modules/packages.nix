@@ -27,6 +27,9 @@
         unzip
         terraform
         ranger
+        go
+        rustc
+        cargo
     ];
   };
 }
