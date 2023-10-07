@@ -73,6 +73,9 @@
     xwayland.enable = true;
     enableNvidiaPatches = true;
   };
+  programs.waybar = {
+    enable = true;
+  };
   
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
