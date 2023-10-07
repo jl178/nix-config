@@ -22,6 +22,7 @@
     enable = true;
     extraConfig = {
       safe.directory = [ "*" ];
+      credential.helper = "! gh auth git-credential";
     };
   };
   programs.zsh = {
