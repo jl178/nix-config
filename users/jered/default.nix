@@ -34,7 +34,8 @@
   }; 
   programs.zsh = {
     enable = true;
-
+    enableAutosuggestions = true;
+    syntaxHighlighting.enable = true;
     shellAliases = {
       n = "nix-shell -p";
       q = "exit";
@@ -104,12 +105,6 @@
       setopt PROMPT_SUBST
       PROMPT='%B%F{green}[%n%f@%F{green}%m]%f %F{blue} %1~%f%b ''${vcs_info_msg_0_}
       ❯ '
-      
-      # ZSH Autosuggestions
-      source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-      # ZSH Syntax Highlighting - must be at the end of .zshrc!
-      source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     '';
   };
 
