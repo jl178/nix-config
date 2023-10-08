@@ -10,6 +10,7 @@
       background_opacity .75
       map ctrl+shift+r no_op
       cursor_shape block
+      shell_integration  no-cursor
     '';
   };
 }
