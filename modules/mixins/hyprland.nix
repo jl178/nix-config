@@ -6,8 +6,11 @@
       wayland.windowManager.hyprland = {
         enable = true;
         xwayland.enable = true;
+
         extraConfig = ''
-          monitor=,preferred,auto,auto
+          monitor=,preferred,auto,1
+          monitor=eDP-1, 1920x1200, auto, 1
+          monitor=HDMI-A-1,preferred,0x0,1
 
           #TODO: Cannot get background working with NixOS natively.
           exec = swaybg -m fill -i ~/.background-image
@@ -113,6 +116,7 @@
           bind = $mainMod, SPACE, exec, wofi # Show the graphicall app launcher
           bind = $mainMod, P, pseudo, # dwindle
           bind = $mainMod, J, togglesplit, # dwindle
+          bind = $mainMod SHIFT, F, fullscreen, # Exit Hyprland all together no (force quit Hyprland)
           bind = $mainMod, S, exec, grim -g "$(slurp)" - | swappy -f - # take a screenshot
 
           bind = ,156, exec, rog-control-center # ASUS Armory crate key

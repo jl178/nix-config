@@ -136,6 +136,7 @@
     XDG_CURRENT_DESKTOP = "Hyprland";
     XDG_SESSION_DESKTOP = "Hyprland";
     WLR_NO_HARDWARE_CURSORS = "1";
+    HYPRLAND_LOG_WLR = "1";
     NIXOS_OZONE_WL = "1";
   };
 
