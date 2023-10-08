@@ -9,6 +9,7 @@
       font_size 12.0
       background_opacity .75
       map ctrl+shift+r no_op
+      cursor_shape block
     '';
   };
 }
