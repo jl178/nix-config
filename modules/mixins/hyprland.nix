@@ -105,8 +105,8 @@
 
           $mainMod = ALT
 
-          bind = $mainMod, RETURN, exec, wezterm #open the terminal
-          bind = $mainMod, Q, exec, kitty #open the backup terminal
+          bind = $mainMod, RETURN, exec, kitty #open the terminal
+          bind = $mainMod, Q, exec, wezterm #open the backup terminal
           bind = $mainMod SHIFT, Q, killactive, # close the active window
           bind = $mainMod SHIFT, L, exec, swaylock # Lock the screen
           bind = $mainMod, M, exec, wlogout --protocol layer-shell # show the logout window
