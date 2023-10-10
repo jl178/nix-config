@@ -39,7 +39,7 @@
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable =
     true; # Easiest to use and most distros use this by default.
-  networking.nameservers = [ "8.8.8.8" ];
+  networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
   # Set your time zone.
   time.timeZone = "America/Denver";
 
