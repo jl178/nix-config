@@ -8,6 +8,7 @@
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
     mixins-fonts
+    mixins-wayland
     mixins-hyprland
     mixins-waybar
   ];
@@ -46,7 +47,7 @@
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-# Select internationalisation properties.
+  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
   # console = {
   #   font = "Lat2-Terminus16";
@@ -54,26 +55,6 @@
   #   useXkbConfig = true; # use xkbOptions in tty.
   # };
   nixpkgs.config.allowUnfree = true;
-  services.xserver = {
-    enable = true;
-    videoDrivers = [ "nvidia" ];
-    displayManager.gdm = {
-      enable = true;
-      wayland = true;
-    };
-    desktopManager.wallpaper.mode = "fill";
-  };
-  hardware = {
-    opengl.enable = true;
-    nvidia.modesetting.enable = true;
-  };
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-    enableNvidiaPatches = true;
-  };
-  programs.waybar = { enable = true; };
-
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
 
@@ -141,15 +122,10 @@
   ];
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-  };
-  environment.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_DESKTOP = "Hyprland";
-    WLR_NO_HARDWARE_CURSORS = "1";
-    HYPRLAND_LOG_WLR = "1";
-    NIXOS_OZONE_WL = "1";
+    remotePlay.openFirewall =
+      true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall =
+      true; # Open ports in the firewall for Source Dedicated Server
   };
 
   # Some programs need SUID wrappers, can be configured further or are
