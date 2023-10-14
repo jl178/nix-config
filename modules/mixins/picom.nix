@@ -6,7 +6,7 @@
   services.picom = {
     enable = true;
     activeOpacity = 1;
-    inactiveOpacity = .75;
+    inactiveOpacity = .9;
     fade = true;
     settings = {
       corner-radius = 8;

@@ -25,7 +25,7 @@ in
                 border = "#3c3836";
                 background = "#285577";
                 text = "#FFFFFF";
-                indicator = "#2e9ef4";
+                indicator = "#3c3836";
                 childBorder = "#3c3836";
                 };
             };

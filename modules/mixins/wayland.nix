@@ -1,16 +1,11 @@
 { config, pkgs, lib, ... }: {
   services.xserver = {
     enable = true;
-    videoDrivers = [ "nvidia" ];
     displayManager.gdm = {
       enable = true;
       wayland = true;
     };
     desktopManager.wallpaper.mode = "fill";
-  };
-  hardware = {
-    opengl.enable = true;
-    nvidia.modesetting.enable = true;
   };
   programs.hyprland = {
     enable = true;

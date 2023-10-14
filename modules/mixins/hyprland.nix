@@ -116,7 +116,7 @@
           bind = $mainMod, SPACE, exec, wofi # Show the graphicall app launcher
           bind = $mainMod, P, pseudo, # dwindle
           bind = $mainMod, J, togglesplit, # dwindle
-          bind = $mainMod SHIFT, F, fullscreen, 1 
+          bind = $mainMod SHIFT, F, fullscreen, 1
           bind = $mainMod, S, exec, grim -g "$(slurp)" - | swappy -f - # take a screenshot
 
           bind = ,156, exec, rog-control-center # ASUS Armory crate key
