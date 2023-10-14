@@ -11,6 +11,7 @@
       map ctrl+shift+r no_op
       cursor_shape block
       shell_integration  no-cursor
+      enable_audio_bell no
     '';
   };
 }
