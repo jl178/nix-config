@@ -111,7 +111,12 @@
     ];
 
   };
-
+  # systemd.services.power = {
+  #   script = ''
+  #   ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
+  #   '';
+  #   wantedBy = [ "multi-user.target" ];
+  # };
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -124,6 +129,7 @@
     pavucontrol
     zsh
     steam-run
+    powertop
   ];
   programs.steam = {
     enable = true;
