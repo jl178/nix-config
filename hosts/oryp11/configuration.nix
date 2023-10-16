@@ -46,6 +46,9 @@
   networking.networkmanager.enable =
     true; # Easiest to use and most distros use this by default.
   networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
+  networking.extraHosts = ''
+    34.194.164.123 registry-1.docker.io
+  '';
   # Set your time zone.
   time.timeZone = "America/Denver";
 
