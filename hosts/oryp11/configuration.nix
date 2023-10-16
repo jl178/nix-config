@@ -116,12 +116,15 @@
     ];
 
   };
-  # systemd.services.power = {
-  #   script = ''
-  #   ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
-  #   '';
-  #   wantedBy = [ "multi-user.target" ];
-  # };
+
+  # Default to battery saver mode on boot - Add sleep of 5 seconds to ensure PowerDaemon is available.
+  systemd.services.system76power = {
+    script = ''
+    sleep 5
+    ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
+    '';
+    wantedBy = [ "multi-user.target" ];
+  };
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
