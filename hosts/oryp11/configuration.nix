@@ -49,6 +49,8 @@
   networking.extraHosts = ''
     34.194.164.123 registry-1.docker.io
   '';
+  networking.enableIPv6 = false;
+  boot.kernelParams = ["ipv6.disable=1"];
   # Set your time zone.
   time.timeZone = "America/Denver";
 
