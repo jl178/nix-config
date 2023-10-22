@@ -104,7 +104,7 @@ in {
 
             [module/nix-label]
             type = custom/text
-            content = %{F#928374}󱄅%{F-}
+            content = %{F#7daea3}󱄅%{F-}
             content-padding = 2
 
             [module/battery]
