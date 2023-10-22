@@ -10,6 +10,12 @@ in
           enable = true;
           package = pkgs.i3-gaps;
           extraConfig = ''
+            # needed for dual screens
+            # exec xrandr --output eDP-1-1 --auto --left-of HDMI-0 &
+            exec xrandr --output eDP-1-1 --auto --noprimary --left-of HDMI-0 &
+            exec xrandr --output HDMI-0 --primary &
+            # Fix background image after boot
+            exec ${pkgs.feh}/bin/feh --bg-fill ~/.background-image
             set $ws1 "1"
             set $ws2 "2"
             set $ws3 "3"
