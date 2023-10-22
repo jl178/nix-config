@@ -18,420 +18,319 @@ let
 in {
   config = {
     home-manager.users.jered = { pkgs, ... }: {
-      services = { polybar = { enable = true;
-      script = "polybar mybar &";
-        extraConfig = ''
-[variables]
-padding=3
-
-[colors]
-; gruvbox dark material palette
-barbackground      = #1d2021  ; dark0_hard
-background         = #282828  ; dark0
-background-alt     = #32302f  ; dark0_soft
-foreground         = #ebdbb2  ; light0
-primary            = #b8bb26  ; bright green
-primaryselected    = #fabd2f  ; bright orange
-primarytext        = #83a598  ; bright aqua
-secondary          = #d3869b  ; bright purple
-
-; CUSTOM COLORS
-white              = #ebdbb2  ; light0
-red                = #fb4934  ; bright red
-green              = #b8bb26  ; bright green
-yellow             = #fabd2f  ; bright yellow
-blue               = #83a598  ; bright aqua
-magenta            = #d3869b  ; bright purple
-alert              = #fb4934  ; bright red (for alerts)
-disabled           = #928374  ; gray
-
-[bar/example]
-dpi      = 98
-width    = 100%
-height   = 30
-offset-x = 0
-offset-y = 0
-
-tray-detached=true
-
-bottom = false
-
-background = ''${colors.barbackground}
-foreground = ''${colors.foreground}
-
-border-bottom-size  = 10
-border-top-size     = 10
-border-left-size  = 10
-border-right-size = 10
-line-size = 3pt
-
-border-size = 1pt
-border-color = #00000000
-
-padding-left = 0
-padding-right = 1
-
-module-margin = 1
-
-separator = "  • "
-separator-foreground = ''${colors.disabled}
-
-font-0 = JetBrains Mono Bold:10;2  ; Specify the JetBrains Mono Bold font
-font-1 = "FontAwesome:pixelsize=14;0"
-
-modules-left = name xworkspaces xwindow
-modules-right = pulseaudio wlan battery
-modules-center =  date
-
-cursor-click = pointer
-cursor-scroll = ns-resize
-
-enable-ipc = true
-
-; tray-position = right
-
-; wm-restack = generic
-; wm-restack = bspwm
- wm-restack = i3
-
-;override-redirect = true
-
-#fixed-center=true
-
-
-
-[module/name]
-;Don't touch this unless you're customizing the module
-type = custom/text
-
-;This is the text, change it with whatever you want
-content = ZEROB://
-
-;Advised not to touch these, edit it from the variables section above or make your own values so it's
-;easier to change
-
-content-padding = ''${variables.padding}
-content-background = ''${colors.green}
-content-foreground = ''${colors.background}
-
-;Left click function, choose whatever appplication you want
-click-left = alacritty
-
-[module/xworkspaces]
-type = internal/xworkspaces
-
-label-active = %name%
-;label-active = ◼
-label-active-foreground = ''${colors.primaryselected}
-label-active-background = ''${colors.magenta}
-label-active-underline= ''${colors.magenta}
-label-active-padding = 5
-
-label-occupied = "%name%"
-;label-occupied = ◻
-label-occupied-padding = 5
-label-occupied-background= ''${colors.background}
-
-label-urgent = %name%
-label-urgent-background = ''${colors.alert}
-label-urgent-padding = 1
-
-label-empty = %name%
-label-empty-foreground = ''${colors.disabled}
-label-empty-background = ''${colors.background-alt}
-label-empty-padding = 1
-
-
-
-
-
-
-[module/xwindow]
-type = internal/xwindow
-label = %title:0:60:...%
-
-
-
-
-
-
-[module/filesystem]
-type = internal/fs
-interval = 25
-
-mount-0 = /
-
-label-mounted = %{F#e0e0e0}%mountpoint%%{F-} %percentage_used%%
-
-label-unmounted = %mountpoint% not mounted
-label-unmounted-foreground = ''${colors.disabled}
-
-label-layout-background = ''${colors.background}
-
-
-
-
-[module/pulseaudio]
-type = internal/pulseaudio
-
-format-volume-prefix = "   VOL"
-format-volume-prefix-foreground = ''${colors.red}
-format-volume = <label-volume>
-format-volume-background = ''${colors.background}
-label-volume-padding = ''${variables.padding}
-
-label-volume = %percentage%%
-label-volume-background = ''${colors.background}
-
-label-muted = muted
-label-muted-foreground = ''${colors.disabled}
-
-
-
-
-
-
-
-;[module/xkeyboard]
-;type = internal/xkeyboard
-;#blacklist-0 = num lock
-;
-;label-layout = %layout%
-;label-layout-foreground = ''${colors.primarytext}
-;label-layout-background = ''${colors.background}
-;label-layout-padding = ''${variables.padding}
-;
-;label-indicator-padding = 2
-;label-indicator-margin = 1
-;label-indicator-foreground = ''${colors.background}
-;label-indicator-background = ''${colors.secondary}
-
-
-
-
-
-
-[module/memory]
-type = internal/memory
-interval = 2
-
-format-prefix = "RAM "
-format-prefix-foreground = ''${colors.green}
-format-background = ''${colors.background}
-format-padding = ''${variables.padding}
-label = %percentage_used:2%%
-
-
-
-
-
-
-[module/cpu]
-type = internal/cpu
-interval = 2
-format-prefix = "CPU "
-format-prefix-foreground = ''${colors.yellow}
-format-background = ''${colors.background}
-format-padding = ''${variables.padding}
-label = %percentage:2%%
-
-
-
-
-
-
-[network-base]
-type = internal/network
-interval = 5
-format-connected = <label-connected>
-format-disconnected = <label-disconnected>
-label-disconnected = %{F#8caab8}%ifname%%{F#707880} disconnected
-label-disconnected-background = ''${colors.background}
-label-disconnected-padding = ''${variables.padding}
-
-
-
-
-[module/wlan]
-inherit = network-base
-interface-type = wireless
-
-label-connected = %{F#8caab8}%ifname%%{F-} %essid%
-label-connected-background = ''${colors.background}
-label-connected-padding = ''${variables.padding}
-;%local_ip%
-
-#[module/eth]
-#inherit = network-base
-#interface-type = wired
-#label-connected = %{F#8caab8}%ifname%%{F-} %local_ip%
-
-
-
-
-
-[module/date]
-type = internal/date
-interval = 1
-
-date = %a %H:%M
-date-alt = %A %d / %m / %Y
-label = %date%
-label-foreground = ''${colors.background}
-label-background = ''${colors.blue}
-label-padding = ''${variables.padding}
-
-
-
-
-[module/battery]
-type = internal/battery
-
-; This is useful in case the battery never reports 100% charge
-; Default: 100
-full-at = 99
-
-; format-low once this charge percentage is reached
-low-at = 20
-
-; Use the following command to list batteries and adapters:
-; $ ls -1 /sys/class/power_supply/
-
-battery = BAT0
-adapter = ADP1
-
-
-; Dissable polling by setting the interval to 0.
-; Default: 5
-
-; I recommend not touching this
-
-poll-interval = 5
-
-;
-;
-;	Label formats, these are what will ultimately be displayed in your battery module.
-;
-;
-
-; This is what will be displayed when your laptop is charging. If you want to edit the labels or animations, go down or search for "animation-charging" or "label-charging"
-format-charging = <animation-charging> <label-charging>
-
-; Same as above, this is for when your laptop is disconnected from battery.
-
-format-discharging = <animation-discharging> <label-discharging>
-
-; Uncomment this if you want a different format, otherwise for me at least only the full label will be displayed.
-;format-full = <ramp-capacity> <label-full>
-
-; Format used when battery level drops to low-at
-; If not defined, format-discharging is used instead.
-
-; Again same as before this will be displayed when the "low-at" value is reached. Also the panic animation will play which you can edit down below.
-format-low = <animation-low> <label-low>
-
-;
-;
-;	Battery Labels, these are the second part displayed in your battery module e.g (BATT percentage charging)
-;
-;
-
-
-;;CHARGING
-;
-
-;label-charging =%{F#a5c99d}BATT %{F-}  %percentage% charging
-
-; if you're using this label comment everything except the padding below (this label only has the BATT colored)
-
-label-charging = BATT %percentage%% charging
-
-; foreground is the text
-label-charging-foreground = ''${colors.background}
-
-; background is the background color
-label-charging-background = ''${colors.green}
-
-; padding is the spacing around the module
-label-charging-padding = ''${variables.padding}
-
-
-;;DISCHARGING
-;
-
-
-label-discharging = %{F#c9c19d}BATT%{F-} %percentage%% discharging
-label-discharging-background = ''${colors.background}
-label-discharging-padding = ''${variables.padding}
-
-; Ignore this.
-;label-discharging = BATT %percentage%%
-
-
-
-;;FULL
-;
-
-label-full = BATT 100% FULL
-label-full-foreground = ''${colors.background}
-label-full-background = ''${colors.yellow}
-label-full-padding = ''${variables.padding}
-
-
-; BATTERY LOW
-;
-label-low = BATT LOW
-label-low-background = ''${colors.red}
-label-low-foreground = ''${colors.background}
-label-low-padding = ''${variables.padding}
-
-; Only applies if <ramp-capacity> is used
-ramp-capacity-0 = o
-ramp-capacity-1 = -
-
-; Only applies if <bar-wcapacity> is used
-bar-capacity-width = 10
-
-;Only applies if <animation-charging> is used
-animation-charging-0 = " (._.) "
-animation-charging-1 = \(._. )>
-animation-charging-2 = <( ._.)/
-animation-charging-3 = \(._.)/
-;Framerate in milliseconds
-animation-charging-framerate = 750
-
-; Only applies if <animation-discharging> is used
-animation-discharging-0 = (o _ o)
-animation-discharging-1 = (o _ o)
-animation-discharging-2 = (o _ o)
-animation-discharging-3 = (o _ o)
-animation-discharging-4 = (o _ o)
-animation-discharging-5 = (- _ -)
-
-;Framerate in milliseconds
-animation-discharging-framerate = 540
-
-; Only applies if <animation-low> is used
-; New in version 3.6.0
-animation-low-0 = "  !!   "
-animation-low-1 = (ó _ ò)
-animation-low-2 = (ó _ ò)
-animation-low-framerate = 400
-
-
-
-
-
-
-
-
-[settings]
-screenchange-reload = true
-pseudo-transparency = true
-
-; vim:ft=dosini
-        '';
-      }; };
+      services = {
+        polybar = {
+          enable = true;
+          package = pkgs.polybar.override {
+            i3Support = true;
+            alsaSupport = true;
+            iwSupport = true;
+            githubSupport = true;
+          };
+          script = "polybar bar &";
+          extraConfig = ''
+
+            [global/wm]
+            # margin-top = 5
+            # margin-bottom = 5
+            # margin-left = 3
+            # margin-right = 3
+
+
+            [colors]
+            ;orange = #FF6200
+            ;orange = #d65d0e
+            darkgray = ''${xrdb:color8}
+            orange = ''${xrdb:color9}
+            white = #ebdbb2
+            gray = #585858
+            black = #090909
+            red = #c795ae
+            blue = #95aec7
+            yellow = #c7ae95
+            green = #aec795
+            #background = #1f222d
+            background = #1D2021
+            background-alt = #4e4e4e
+            foreground = #ebdbb2
+            # foreground = ''${xrdb:foreground}
+            foreground-alt = #4e4e4e
+            primary = #1f222d
+            secondary = #FF6200
+            alert = #fb4934
+
+            [bar/bar]
+            bottom = false
+            ; wm-restack = i3
+            ; width = 1344
+            height = 26
+             offset-x = 20
+             offset-y = 20
+
+            locale = en_US.UTF-8
+
+            enable-ipc = true
+
+            # padding-left = 5
+            # padding-right = 5
+
+            module-margin-right = 0
+            module-margin-left = 0
+
+            modules-right = separator battery separator cpu separator memory separator network separator volume
+            modules-left = nix-label separator i3 separator date separator
+            modules-center = xwindow
+
+            background = ''${colors.background}
+            foreground = ''${colors.foreground}
+
+            underline-size = 0
+            underline-color = ''${colors.white}
+
+            tray-detached = false
+            tray-position =
+            tray-offset-x = 0
+            tray-offset-y = 0
+            ;tray-maxsize = 16
+            tray-padding = 0
+            tray-transparent = false
+            tray-scale = 1.0
+
+            font-0 = "JetBrainsMono:size=10:weight=bold;2"
+            font-1 = Font Awesome 6 Free:pixelsize=12;2
+            font-2 = Font Awesome 6 Free Solid:pixelsize=12;2
+            font-3 = Font Awesome 6 Brands:pixelsize=12;2
+            font-4 = "JetBrainsMono Nerd Font:size=15:weight=bold;2"
+
+            [module/nix-label]
+            type = custom/text
+            content = %{F#928374}󱄅%{F-}
+            content-padding = 2
+
+            [module/battery]
+            type = internal/battery
+
+            full-at = 95
+            low-at = 15
+            battery = BAT0
+            adapter = ADP1
+            poll-interval = 5
+
+            time-format = %H:%M
+            format-charging = <animation-charging> <label-charging>
+            format-discharging = <ramp-capacity> <label-discharging>
+            format-full = <ramp-capacity> <label-full>
+            format-low = <label-low> <animation-low>
+            format-charing-padding = 2
+            format-discharing-padding = 2
+            format-full-padding = 2
+
+            label-charging = %percentage%%
+            label-discharging = %percentage%%
+            label-full = %percentage%%
+            label-low = %percentage%%
+
+            ramp-capacity-0 = %{F#928374}%{F-}
+            ramp-capacity-1 = %{F#928374}%{F-}
+            ramp-capacity-2 = %{F#928374}%{F-}
+            ramp-capacity-3 = %{F#928374}%{F-}
+            ramp-capacity-4 = %{F#928374}%{F-}
+
+            bar-capacity-width = 10
+
+            animation-charging-0 = %{F#928374}%{F-}
+            animation-charging-1 = %{F#928374}%{F-}
+            animation-charging-2 = %{F#928374}%{F-}
+            animation-charging-3 = %{F#928374}%{F-}
+            animation-charging-4 = %{F#928374}%{F-}
+
+            animation-charging-framerate = 750
+
+            animation-discharging-0 = %{F#928374}%{F-}
+            animation-discharging-1 = %{F#928374}%{F-}
+            animation-discharging-2 = %{F#928374}%{F-}
+            animation-discharging-3 = %{F#928374}%{F-}
+            animation-discharging-4 = %{F#928374}%{F-}
+            animation-discharging-framerate = 500
+
+            animation-low-0 = !
+            animation-low-1 =
+            animation-low-framerate = 200
+
+            [module/cpu]
+            type = internal/cpu
+
+            ; Seconds to sleep between updates
+            ; Default: 1
+            interval = 0.5
+            format = <label>
+            label = %{F#928374} %{F-} %percentage%%
+            format-padding = 2
+
+            [module/memory]
+            type = internal/memory
+
+            ; Seconds to sleep between updates
+            ; Default: 1
+            interval = 3
+            format = <label>
+            label = %{F#928374} %{F-} %gb_used%/%gb_free%
+            format-padding = 2
+
+            # [module/temperature]
+            # type = internal/temperature
+            #
+            # interval = 0.5
+            #
+            # thermal-zone = 0
+            #
+            # base-temperature = 20
+            # format = <label>
+            # format-padding = 2
+            # label = %{F#928374}%{F-} %temperature-c%
+
+            [module/i3]
+            type = internal/i3
+            format = <label-state> <label-mode>
+            format-padding = 2
+            label-focused = %index%
+            label-focused-foreground = ''${colors.foreground}
+            label-focused-padding = 1
+            label-focused-background = ''${colors.background-alt}
+            label-focused-underline= ''${colors.foreground}
+
+            label-unfocused = %index%
+            label-unfocused-padding = 1
+
+            label-visible = %index%
+            label-visible-padding = 1
+
+            label-urgent = %index%
+            label-urgent-background = ''${colors.alert}
+            label-urgent-padding = 1
+
+            label-separator = |
+            label-separator-padding = 1
+
+            [module/xwindow]
+            type = internal/xwindow
+            max-length = 50
+
+            [module/date]
+            type = internal/date
+            #date-alt =   %A %H:%M
+            date = %{F#928374} %{F-} %Y-%m-%d %I:%M %p
+            interval = 5
+            format-underline = ''${colors.white}
+            ;format-background = ''${colors.black}
+            format-foreground = ''${colors.foreground}
+            format-padding = 2
+
+            label-separator = ┃
+
+            [module/volume]
+            type = internal/volume
+
+            format-volume = <label-volume>
+            format-volume-padding = 2
+
+            format-volume-underline = ''${colors.white}
+
+            label-volume = %{F#928374} %{F-}%percentage:3%%
+            #label-volume-foreground = ''${color.white}
+
+            label-muted =%{F#928374} %{F-}mute
+            format-muted = <label-muted>
+            format-muted-underline = ''${colors.white}
+            format-muted-padding = 2
+            #label-muted-foreground = ''${colors.gray}
+
+            format-padding = 2
+
+            [module/network]
+            type = internal/network
+            interface = wlp0s20f3
+
+            ; Seconds to sleep between updates
+            ; Default: 1
+            interval = 3.0
+
+            ; Test connectivity every Nth update
+            ; A value of 0 disables the feature
+            ; NOTE: Experimental (needs more testing)
+            ; Default: 0
+            ;ping-interval = 3
+
+            ; @deprecated: Define min width using token specifiers (%downspeed:min% and %upspeed:min%)
+            ; Minimum output width of upload/download rate
+            ; Default: 3
+
+            ; Accumulate values from all interfaces
+            ; when querying for up/downspeed rate
+            ; Default: false
+            accumulate-stats = true
+
+            format-connected-padding = 2
+            format-disconnected-padding = 2
+            format-connected-underline = ''${colors.white}
+            format-disconnected-underline = ''${colors.white}
+
+            ; Available tags:
+            ;   <label-connected> (default)
+            ;   <ramp-signal>
+            format-connected = %{F#928374} %{F-}<label-connected>
+
+            ; Available tags:
+            ;   <label-disconnected> (default)
+            format-disconnected = <label-disconnected>
+
+            ; Available tags:
+            ;   <label-connected> (default)
+            ;   <label-packetloss>
+            ;   <animation-packetloss>
+            format-packetloss = <animation-packetloss> <label-connected>
+
+            ; Available tokens:
+            ;   %ifname%    [wireless+wired]
+            ;   %local_ip%  [wireless+wired]
+            ;   %essid%     [wireless]
+            ;   %signal%    [wireless]
+            ;   %upspeed%   [wireless+wired]
+            ;   %downspeed% [wireless+wired]
+            ;   %linkspeed% [wired]
+            ; Default: %ifname% %local_ip%
+            label-connected = %signal:3%%
+
+            ; Available tokens:
+            ;   %ifname%    [wireless+wired]
+            ; Default: (none)
+            label-disconnected = %{F#928374} %{F-}none
+
+            ; Available tokens:
+            ;   %ifname%    [wireless+wired]
+            ;   %local_ip%  [wireless+wired]
+            ;   %essid%     [wireless]
+            ;   %signal%    [wireless]
+            ;   %linkspeed% [wired]
+            ; Default: (none)
+            ;label-packetloss = %essid%
+            ;label-packetloss-foreground = #eefafafa
+
+            ; Only applies if <animation-packetloss> is used
+            animation-packetloss-0 = ⚠
+            animation-packetloss-1 = 📶
+            ; Framerate in milliseconds
+            animation-packetloss-framerate = 500
+
+            [module/separator]
+            type = custom/text
+            content = ┃
+            content-foreground = #4e4e4e
+
+            ; vim:ft=dosini
+          '';
+        };
+      };
     };
   };
 }

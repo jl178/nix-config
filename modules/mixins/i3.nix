@@ -9,6 +9,40 @@ in
       xsession.windowManager.i3 = {
           enable = true;
           package = pkgs.i3-gaps;
+          extraConfig = ''
+            set $ws1 "1"
+            set $ws2 "2"
+            set $ws3 "3"
+            set $ws4 "4"
+            set $ws5 "5"
+            set $ws6 "6"
+            set $ws7 "7"
+            set $ws8 "8"
+            set $ws9 "9"
+            set $ws10 "10"
+
+            bindcode Mod1+10 workspace number $ws1
+            bindcode Mod1+11 workspace number $ws2
+            bindcode Mod1+12 workspace number $ws3
+            bindcode Mod1+13 workspace number $ws4
+            bindcode Mod1+14 workspace number $ws5
+            bindcode Mod1+15 workspace number $ws6
+            bindcode Mod1+16 workspace number $ws7
+            bindcode Mod1+17 workspace number $ws8
+            bindcode Mod1+18 workspace number $ws9
+            bindcode Mod1+19 workspace number $ws10
+
+            bindcode Mod1+Shift+10 move container to workspace number $ws1
+            bindcode Mod1+Shift+11 move container to workspace number $ws2
+            bindcode Mod1+Shift+12 move container to workspace number $ws3
+            bindcode Mod1+Shift+13 move container to workspace number $ws4
+            bindcode Mod1+Shift+14 move container to workspace number $ws5
+            bindcode Mod1+Shift+15 move container to workspace number $ws6
+            bindcode Mod1+Shift+16 move container to workspace number $ws7
+            bindcode Mod1+Shift+17 move container to workspace number $ws8
+            bindcode Mod1+Shift+18 move container to workspace number $ws9
+            bindcode Mod1+Shift+19 move container to workspace number $ws10
+          '';
           config = {
             inherit modifier;
 

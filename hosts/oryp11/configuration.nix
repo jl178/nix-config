@@ -9,13 +9,13 @@
     ./hardware-configuration.nix
     mixins-fonts
     mixins-nvidia
-    # mixins-i3
-    # mixins-xorg
-    # mixins-picom
-    # mixins-polybar
-    mixins-wayland
-    mixins-hyprland
-    mixins-waybar
+    mixins-i3
+    mixins-xorg
+    mixins-picom
+    mixins-polybar
+    # mixins-wayland
+    # mixins-hyprland
+    # mixins-waybar
   ];
 
   # Use the systemd-boot EFI boot loader.

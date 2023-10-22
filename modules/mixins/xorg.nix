@@ -8,6 +8,7 @@
 
     desktopManager = {
       xterm.enable = false;
+      wallpaper.mode = "fill";
     };
 
     displayManager = {
