@@ -34,11 +34,15 @@
       # macOS compatible packages
     ];
   };
-
+  environment.variables = {
+    NIX_LDFLAGS="-F${pkgs.darwin.apple_sdk.frameworks.CoreFoundation}/Library/Frameworks -framework CoreFoundation $NIX_LDFLAGS";
+  };
   # List packages installed in system profile
   environment.systemPackages = with pkgs; [
     vim
     git
+    mktemp
+    darwin.apple_sdk.frameworks.System
+    darwin.apple_sdk.frameworks.CoreFoundation
   ];
-
 }

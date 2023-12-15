@@ -23,7 +23,8 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl, home-manager, agenix, darwin, utils, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl
+    , home-manager, agenix, darwin, utils, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
         iseries = nixpkgs.lib.nixosSystem {

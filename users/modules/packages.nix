@@ -5,7 +5,7 @@
     packages = with pkgs; [
       htop
       # gcc
-      clang
+      # clang
       cmake
       lsd
       neovim
