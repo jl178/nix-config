@@ -1,1 +1,3 @@
-{ jered = import ./jered; }
+{
+  jered = import ./jered;
+}

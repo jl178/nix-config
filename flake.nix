@@ -17,10 +17,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     utils = { url = "github:gytis-ivaskevicius/flake-utils-plus"; };
+    darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, home-manager, nixpkgs, nixpkgs2305, agenix, nixos-hardware, nixos-wsl
-    , utils, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl, home-manager, agenix, darwin, utils, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
         iseries = nixpkgs.lib.nixosSystem {
@@ -57,7 +60,17 @@
           ];
           specialArgs = { inherit inputs; };
         };
-
+      };
+      darwinConfigurations = {
+        "jlittle-mbp16" = darwin.lib.darwinSystem {
+          system = "x86_64-darwin";
+          modules = [
+            ./hosts/darwin/configuration.nix
+            home-manager.darwinModules.home-manager
+            # other modules specific to macOS
+          ];
+          specialArgs = { inherit inputs; };
+        };
       };
     };
 }

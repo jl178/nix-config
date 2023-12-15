@@ -12,8 +12,8 @@
   manual.manpages.enable = false;
 
   home = {
-    username = "jered";
-    homeDirectory = "/home/jered";
+    username = "jeredlittle";
+    homeDirectory = "/Users/jeredlittle";
     packages = with pkgs; [ zsh git gh ];
   };
 

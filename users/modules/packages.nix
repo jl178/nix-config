@@ -17,7 +17,7 @@
       kubectl
       k9s
       kind
-      helm
+      kubernetes-helm
       jdk11
       unzip
       terraform
