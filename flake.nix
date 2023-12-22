@@ -63,8 +63,8 @@
         };
       };
       darwinConfigurations = {
-        "jlittle-mbp16" = darwin.lib.darwinSystem {
-          system = "x86_64-darwin";
+        "jlittle-mbp" = darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
           modules = [
             ./hosts/darwin/configuration.nix
             home-manager.darwinModules.home-manager

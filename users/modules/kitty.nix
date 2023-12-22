@@ -5,6 +5,7 @@
     enable = true;
     theme = "Gruvbox Material Dark Hard";
     extraConfig = ''
+      hide_window_decorations yes
       font_family JetBrains Mono
       font_size 12.0
       background_opacity .75

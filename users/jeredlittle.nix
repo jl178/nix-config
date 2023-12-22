@@ -1,3 +1,0 @@
-{
-  jeredlittle = import ./jeredlittle;
-}
