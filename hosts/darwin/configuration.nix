@@ -6,9 +6,10 @@
   time.timeZone = "America/Denver";
   fonts.enableFontDir = true;
   fonts.fonts = with pkgs; [ font-awesome nerdfonts ];
-  system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = true;
+  system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = false;
 
   services.nix-daemon.enable = true;
+  system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
   services.yabai.enable = true;
