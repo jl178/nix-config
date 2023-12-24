@@ -10,7 +10,8 @@
 
   services.nix-daemon.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
-  # Allow unfree packages
+  system.defaults.NSGlobalDomain.InitialKeyRepeat = 15;
+  system.defaults.NSGlobalDomain.KeyRepeat = 3;
   nixpkgs.config.allowUnfree = true;
   services.yabai.enable = true;
   services.yabai.extraConfig = ''

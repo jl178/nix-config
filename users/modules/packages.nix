@@ -3,6 +3,9 @@
   # General packages which are used across various programs.
   home = {
     packages = with pkgs; [
+      python310Packages.pip
+      python310Packages.mysqlclient
+      pkg-config
       htop
       # gcc
       # clang
