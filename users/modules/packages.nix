@@ -28,6 +28,7 @@
       go
       rustc
       cargo
+      docker
     ];
   };
 }

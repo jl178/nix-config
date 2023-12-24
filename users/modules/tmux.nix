@@ -9,6 +9,7 @@
       tmuxPlugins.vim-tmux-navigator
       tmuxPlugins.yank
     ];
+    keyMode="vi";
     historyLimit = 100000;
 
     extraConfig = ''
