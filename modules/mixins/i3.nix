@@ -12,8 +12,8 @@ in
           extraConfig = ''
             # needed for dual screens
             # exec xrandr --output eDP-1-1 --auto --left-of HDMI-0 &
-            exec xrandr --output eDP-1-1 --auto --noprimary --left-of HDMI-0 &
-            exec xrandr --output HDMI-0 --primary &
+            exec xrandr --output eDP-1-1 --auto --noprimary --left-of HDMI-0
+            exec xrandr --output HDMI-0 --primary
             # Fix background image after boot
             exec ${pkgs.feh}/bin/feh --bg-fill ~/.background-image
             set $ws1 "1"
