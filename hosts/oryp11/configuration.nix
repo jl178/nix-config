@@ -46,9 +46,9 @@
   networking.networkmanager.enable =
     true; # Easiest to use and most distros use this by default.
   networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
-  networking.extraHosts = ''
-    34.194.164.123 registry-1.docker.io
-  '';
+  # networking.extraHosts = ''
+  #   34.194.164.123 registry-1.docker.io
+  # '';
   networking.enableIPv6 = false;
   boot.kernelParams = ["ipv6.disable=1"];
   # Set your time zone.
@@ -89,7 +89,15 @@
   services.blueman.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput = {
+      enable = true;
+      touchpad.tapping = true;
+      touchpad.naturalScrolling = true;
+      touchpad.scrollMethod = "twofinger";
+      touchpad.disableWhileTyping = true;
+      touchpad.clickMethod = "clickfinger";
+
+    };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
