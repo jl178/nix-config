@@ -5,7 +5,7 @@
 { config, pkgs, inputs, ... }:
 
 {
-  imports = [
+  imports = with inputs.self.nixosModules;[
     # ./hardware-configuration.nix
     # mixins-fonts
     # mixins-nvidia
@@ -18,6 +18,7 @@
     # mixins-waybar
     # <nixos-wsl/modules>
     inputs.nixos-wsl.nixosModules.wsl
+    mixins-neovim
   ];
 
   wsl.enable = true;

@@ -11,7 +11,6 @@
       # clang
       cmake
       lsd
-      neovim
       python3
       nodejs_18
       fzf

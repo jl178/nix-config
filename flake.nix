@@ -8,6 +8,10 @@
     nixos-wsl.url = "github:nix-community/nixos-wsl";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl.inputs.flake-utils.follows = "utils";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,7 +27,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl
+  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl, nixvim
     , home-manager, agenix, darwin, utils, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
@@ -56,8 +60,7 @@
             utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
-            # <nixos-wsl/modules>
-            # nixos-hardware.nixosModules.common-gpu-nvidia
+            nixvim.nixosModules.nixvim
           ];
           specialArgs = { inherit inputs; };
         };
