@@ -11,6 +11,7 @@
           monitor=,preferred,auto,1
           monitor=eDP-1, 1920x1200, auto, 1
           monitor=HDMI-A-1,preferred,0x0,1
+          exec = brightnessctl set 7
 
           #TODO: Cannot get background working with NixOS natively.
           exec = swaybg -m fill -i ~/.background-image

@@ -51,7 +51,7 @@
     3.219.239.5 registry-1.docker.io
   '';
   networking.enableIPv6 = false;
-  boot.kernelParams = ["ipv6.disable=1"];
+  boot.kernelParams = [ "ipv6.disable=1" ];
   # Set your time zone.
   time.timeZone = "America/Denver";
 
@@ -91,14 +91,14 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   services.xserver.libinput = {
-      enable = true;
-      touchpad.tapping = true;
-      touchpad.naturalScrolling = true;
-      touchpad.scrollMethod = "twofinger";
-      touchpad.disableWhileTyping = true;
-      touchpad.clickMethod = "clickfinger";
+    enable = true;
+    touchpad.tapping = true;
+    touchpad.naturalScrolling = true;
+    touchpad.scrollMethod = "twofinger";
+    touchpad.disableWhileTyping = true;
+    touchpad.clickMethod = "clickfinger";
 
-    };
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
@@ -129,8 +129,8 @@
   # Default to battery saver mode on boot - Add sleep of 5 seconds to ensure PowerDaemon is available.
   systemd.services.system76power = {
     script = ''
-    sleep 5
-    ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
+      sleep 5
+      ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
     '';
     wantedBy = [ "multi-user.target" ];
   };
@@ -148,6 +148,7 @@
     steam-run
     powertop
     feh
+    brightnessctl
   ];
   programs.steam = {
     enable = true;
