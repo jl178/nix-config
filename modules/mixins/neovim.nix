@@ -20,12 +20,9 @@
     ./neovim/notify.nix
     ./neovim/trouble.nix
     ./neovim/lint.nix
+    ./neovim/gitlinker.nix
   ];
   programs.nixvim = {
-    #   colorschemes.gruvbox = {
-    #     enable = true;
-    #     contrastDark = "hard";
-    #   };
     enable = true;
     globals.mapleader = " ";
     options = {
