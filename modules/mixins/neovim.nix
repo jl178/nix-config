@@ -18,6 +18,8 @@
     ./neovim/which-key.nix
     ./neovim/copilot.nix
     ./neovim/notify.nix
+    ./neovim/trouble.nix
+    ./neovim/lint.nix
   ];
   programs.nixvim = {
     #   colorschemes.gruvbox = {
@@ -48,7 +50,6 @@
     clipboard.register = "unnamedplus";
     viAlias = true;
     vimAlias = true;
-    plugins.trouble.enable = true;
     keymaps = [
       {
         mode = "v";
