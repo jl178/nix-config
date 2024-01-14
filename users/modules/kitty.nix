@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }:
-{
+{ config, pkgs, lib, ... }: {
   home = { packages = with pkgs; [ jetbrains-mono kitty ]; };
   programs.kitty = {
     enable = true;
@@ -7,7 +6,7 @@
     extraConfig = ''
       hide_window_decorations yes
       font_family JetBrains Mono
-      font_size 12.0
+      font_size 14.0
       background_opacity .75
       map ctrl+shift+r no_op
       cursor_shape block
