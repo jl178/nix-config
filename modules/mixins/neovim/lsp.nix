@@ -54,12 +54,21 @@
         }
       vim.diagnostic.config({
         virtual_text = {
-          prefix = ' ', -- You can choose any prefix symbol
+          prefix = '■', -- You can choose any prefix symbol
           spacing = 4, -- Spacing between the line text and the diagnostic message
         },
         float = {
         },
       })
+      require"fidget".setup{
+        notification = {
+            window = {
+              normal_hl = "Normal",
+              winblend = 0, -- Value for 'winblend'
+              border = "rounded",
+            },
+        },
+      }
     '';
   };
 }

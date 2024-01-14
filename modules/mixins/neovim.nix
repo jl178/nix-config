@@ -44,6 +44,7 @@
       termguicolors = true;
       expandtab = true;
       smartindent = true;
+      autoindent = true;
       tabstop = 4;
       shiftwidth = 4;
     };

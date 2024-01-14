@@ -1,4 +1,4 @@
-{
+{ config, pkgs, inputs, ... }: {
   programs.nixvim.plugins.lint = {
     enable = true;
     lintersByFt = {
@@ -9,4 +9,12 @@
       python = [ "ruff" ];
     };
   };
+  environment.systemPackages = with pkgs; [
+    nodePackages.jsonlint
+    vale
+    tflint
+    tfsec
+    yamllint
+    ruff
+  ];
 }

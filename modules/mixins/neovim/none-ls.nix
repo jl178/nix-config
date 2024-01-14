@@ -1,4 +1,4 @@
-{
+{ config, pkgs, inputs, ... }: {
   programs.nixvim.plugins.none-ls = {
     enable = true;
     enableLspFormat = true;
@@ -14,4 +14,13 @@
       beautysh.enable = true;
     };
   };
+  environment.systemPackages = with pkgs; [
+    black
+    nodePackages.eslint
+    nixfmt
+    jq
+    sqlfluff
+    stylua
+    beautysh
+  ];
 }
