@@ -10,12 +10,19 @@
     keymaps.lspBuf = { "<leader>fm" = "format"; };
     servers.nixd.enable = true;
     servers.cssls.enable = true;
+    servers.clangd.enable = true;
+    servers.cmake.enable = true;
+    servers.dockerls.enable = true;
+    servers.gopls.enable = true;
     servers.java-language-server.enable = true;
     servers.jsonls.enable = true;
     servers.lua-ls.enable = true;
     servers.pyright.enable = true;
     servers.tsserver.enable = true;
     servers.yamlls.enable = true;
+    servers.terraformls.enable = true;
+    servers.tailwindcss.enable = true;
+    servers.bashls.enable = true;
     onAttach = ''
       local nmap = function(keys, func, desc)
         if desc then
