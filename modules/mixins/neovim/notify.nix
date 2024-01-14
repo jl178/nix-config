@@ -1,10 +1,7 @@
 {
-  programs.nixvim.plugins.notify = { enable = true; };
-  programs.nixvim = {
-    extraConfigLua = ''
-      require("notify").setup({
-        background_colour = "#000000",
-      })
-    '';
+  programs.nixvim.plugins.notify = {
+    enable = true;
+    fps = 60;
+    backgroundColour = "#000000";
   };
 }
