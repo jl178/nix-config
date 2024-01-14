@@ -46,9 +46,9 @@
   networking.networkmanager.enable =
     true; # Easiest to use and most distros use this by default.
   networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
-  # networking.extraHosts = ''
-  #   34.194.164.123 registry-1.docker.io
-  # '';
+  networking.extraHosts = ''
+    3.219.239.5 registry-1.docker.io
+  '';
   networking.enableIPv6 = false;
   boot.kernelParams = ["ipv6.disable=1"];
   # Set your time zone.

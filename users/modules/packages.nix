@@ -28,6 +28,9 @@
       rustc
       cargo
       docker
+      docker-compose
+      glab
+      azure-cli
     ];
   };
 }
