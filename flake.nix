@@ -48,6 +48,7 @@
             utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
+            nixvim.nixosModules.nixvim
             # nixos-hardware.nixosModules.common-gpu-nvidia
           ];
           specialArgs = { inherit inputs; };
