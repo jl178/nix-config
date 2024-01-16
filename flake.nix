@@ -71,6 +71,7 @@
           modules = [
             ./hosts/darwin/configuration.nix
             home-manager.darwinModules.home-manager
+            nixvim.nixDarwinModules.nixvim
             # other modules specific to macOS
           ];
           specialArgs = { inherit inputs; };

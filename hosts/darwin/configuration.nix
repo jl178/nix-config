@@ -1,6 +1,9 @@
 { config, pkgs, inputs, ... }:
 
 {
+  imports = with inputs.self.nixosModules; [
+    mixins-neovim
+  ];
 
   # Set your time zone
   time.timeZone = "America/Denver";

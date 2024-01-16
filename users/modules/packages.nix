@@ -31,6 +31,10 @@
       docker-compose
       glab
       azure-cli
+      awscli2
+      google-cloud-sdk
+      mysql
+      mariadb
     ];
   };
 }
