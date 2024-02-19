@@ -48,7 +48,7 @@
     true; # Easiest to use and most distros use this by default.
   networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
   networking.extraHosts = ''
-    3.219.239.5 registry-1.docker.io
+    54.227.20.253 registry-1.docker.io
   '';
   networking.enableIPv6 = false;
   boot.kernelParams = [ "ipv6.disable=1" ];
