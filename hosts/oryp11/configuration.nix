@@ -149,6 +149,8 @@
     powertop
     feh
     brightnessctl
+    slurp
+    grim
   ];
   programs.steam = {
     enable = true;

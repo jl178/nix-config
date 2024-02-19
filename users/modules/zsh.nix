@@ -8,6 +8,10 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       web = "google-chrome-stable --disable-gpu &> /dev/null & disown";
+      screenshot =
+        ''grim -g "$(slurp -o)" $HOME/Pictures/$(date +'%s_grim.png')'';
+      snip = ''
+        grim -g "$(slurp)" $HOME/Pictures/Screenshots/$(date +'%s_grim.png')'';
       n = "nix-shell -p";
       q = "exit";
       ls = "lsd -Fl";
