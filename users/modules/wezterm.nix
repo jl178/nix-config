@@ -80,7 +80,7 @@
           font = wezterm.font("JetBrains Mono Bold Italic"),
         },
       }
-      config.font_size = 12.0
+      config.font_size = 16.0
       config.keys = {
         { key = "l", mods = "ALT",        action = wezterm.action.ShowLauncher },
         { key = '{', mods = 'ALT',        action = act.ActivateTabRelative(-1) },
