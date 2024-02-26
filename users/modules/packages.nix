@@ -35,6 +35,7 @@
       google-cloud-sdk
       mysql
       mariadb
+      airlift
     ];
   };
 }
