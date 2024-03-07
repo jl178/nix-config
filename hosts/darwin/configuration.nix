@@ -1,9 +1,7 @@
 { config, pkgs, inputs, ... }:
 
 {
-  imports = with inputs.self.nixosModules; [
-    mixins-neovim
-  ];
+  imports = with inputs.self.nixosModules; [ mixins-neovim ];
 
   # Set your time zone
   time.timeZone = "America/Denver";
@@ -55,7 +53,7 @@
     mouse_drop_action            swap
 
     echo "yabai configuration loaded.."
-'';
+  '';
   # Home Manager integration
   home-manager = {
     useGlobalPkgs = true;
@@ -67,7 +65,7 @@
     };
   };
   system.defaults.dock.autohide = true;
-# Enable programs
+  # Enable programs
   programs.zsh.enable = true;
   environment.loginShell = pkgs.zsh;
 
@@ -75,12 +73,14 @@
   # users.defaultUserShell = pkgs.zsh;
   users.users."jered.little" = {
     home = "/Users/jered.little";
-    packages = with pkgs; [
-      # macOS compatible packages
-    ];
+    packages = with pkgs;
+      [
+        # macOS compatible packages
+      ];
   };
   environment.variables = {
-    NIX_LDFLAGS="-F${pkgs.darwin.apple_sdk.frameworks.CoreFoundation}/Library/Frameworks -framework CoreFoundation $NIX_LDFLAGS";
+    NIX_LDFLAGS =
+      "-F${pkgs.darwin.apple_sdk.frameworks.CoreFoundation}/Library/Frameworks -framework CoreFoundation $NIX_LDFLAGS";
   };
   # List packages installed in system profile
   environment.systemPackages = with pkgs; [
@@ -91,5 +91,6 @@
     darwin.apple_sdk.frameworks.CoreFoundation
     wezterm
     kitty
+    docker-credential-helpers
   ];
 }
