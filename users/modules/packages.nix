@@ -18,7 +18,7 @@
       lazygit
       kubectl
       k9s
-      kind
+      # kind
       kubernetes-helm
       jdk11
       unzip
