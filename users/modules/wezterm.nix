@@ -87,7 +87,7 @@
         { key = '}', mods = 'ALT',        action = act.ActivateTabRelative(1) },
         { key = "r", mods = "CTRL|SHIFT", action = "DisableDefaultAssignment" },
       }
-      config.window_background_opacity = .80
+      config.window_background_opacity = .95
       config.window_padding = {
         left = 1,
         right = 1,
