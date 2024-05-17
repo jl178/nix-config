@@ -149,25 +149,26 @@
       {
         mode = "n";
         key = "[d";
-        action = "vim.diagnostic.goto_prev";
+        action = "<cmd>vim.diagnostic.goto_prev()<CR>";
         options = { desc = "Go to previous diagnostic message"; };
       }
       {
         mode = "n";
         key = "]d";
-        action = "vim.diagnostic.goto_next";
+        action = "<cmd>vim.diagnostic.goto_next()<CR>";
         options = { desc = "Go to next diagnostic message"; };
       }
       {
         mode = "n";
         key = "<leader>df";
-        action = "vim.diagnostic.open_float";
+        action =
+          ''<cmd>lua vim.diagnostic.open_float(nil, {border = "rounded"})<CR>'';
         options = { desc = "Open [D]iagnostic [F]loating message"; };
       }
       {
         mode = "n";
         key = "<leader>q";
-        action = "vim.diagnostic.setloclist";
+        action = "<cmd>vim.diagnostic.setloclist()<CR>";
         options = { desc = "Open diagnostics list"; };
       }
     ];
