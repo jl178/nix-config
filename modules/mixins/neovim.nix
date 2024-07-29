@@ -22,6 +22,7 @@
     ./neovim/lint.nix
     ./neovim/gitlinker.nix
     ./neovim/toggleterm.nix
+    ./neovim/transparent.nix
   ];
   programs.nixvim = {
     enable = true;

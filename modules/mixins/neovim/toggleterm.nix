@@ -3,7 +3,7 @@
     enable = true;
     direction = "float";
     shell = "zsh";
-    openMapping = "tf";
+    settings = { open_mapping = "tf"; };
     insertMappings = false;
     highlights = {
       Normal = { guibg = "NONE"; };

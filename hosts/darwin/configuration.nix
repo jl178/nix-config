@@ -5,8 +5,7 @@
 
   # Set your time zone
   time.timeZone = "America/Denver";
-  fonts.enableFontDir = true;
-  fonts.fonts = with pkgs; [ font-awesome nerdfonts ];
+  fonts.packages = with pkgs; [ font-awesome nerdfonts ];
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = false;
 
   services.nix-daemon.enable = true;

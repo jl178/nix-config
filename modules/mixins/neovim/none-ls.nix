@@ -4,19 +4,19 @@
     enableLspFormat = true;
     sources.formatting = {
       black.enable = true;
-      eslint.enable = true;
+      biome.enable = true;
       nixfmt.enable = true;
-      jq.enable = true;
+      # jq.enable = true;
       gofmt.enable = true;
       sqlfluff.enable = true;
-      trim_whitespace.enable = true;
+      # trim_whitespace.enable = true;
       stylua.enable = true;
-      beautysh.enable = true;
+      shfmt.enable = true;
     };
   };
   environment.systemPackages = with pkgs; [
     black
-    nodePackages.eslint
+    # nodePackages.prettier
     nixfmt
     jq
     sqlfluff

@@ -14,7 +14,7 @@
     servers.cmake.enable = true;
     servers.dockerls.enable = true;
     servers.gopls.enable = true;
-    servers.java-language-server.enable = true;
+    servers.jdt-language-server.enable = true;
     servers.jsonls.enable = true;
     servers.lua-ls.enable = true;
     servers.pyright.enable = true;
@@ -23,6 +23,7 @@
     servers.terraformls.enable = true;
     servers.tailwindcss.enable = true;
     servers.bashls.enable = true;
+    # servers.groovyls.enable = true;
     onAttach = ''
       local nmap = function(keys, func, desc)
         if desc then

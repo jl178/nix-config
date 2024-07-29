@@ -2,13 +2,7 @@
   programs.nixvim.plugins = {
     cmp-nvim-lsp.enable = true;
     luasnip.enable = true;
-  };
-  programs.nixvim.plugins.nvim-cmp = {
-    enable = true;
-    snippet.expand = "luasnip";
-    sources =
-      [ { name = "nvim_lsp"; } { name = "path"; } { name = "buffer"; } ];
-    mapping = { "<CR>" = "cmp.mapping.confirm({ select = true })"; };
+    cmp.enable = true;
   };
   programs.nixvim = {
     extraConfigLua = ''
