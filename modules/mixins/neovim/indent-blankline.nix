@@ -4,8 +4,8 @@
     settings.indent.char = "┊";
     settings.scope = {
       enabled = true;
-      showStart = true;
-      showEnd = false;
+      # showStart = true;
+      # showEnd = false;
     };
   };
 }
