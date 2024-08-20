@@ -1,6 +1,6 @@
 {
   programs.nixvim.plugins.trouble = {
     enable = true;
-    useDiagnosticSigns = true;
+    settings.use_diagnostic_signs = true;
   };
 }

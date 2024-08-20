@@ -7,7 +7,7 @@
     extensions.fzf-native.enable = true;
     highlightTheme = "gruvbox-material";
 
-    extensions.file-browser = {
+    extensions.file-browser.settings = {
       enable = true;
       hidden = true;
       depth = 9999999999;

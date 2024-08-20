@@ -4,7 +4,7 @@
   home = { packages = with pkgs; [ zsh ]; };
   programs.zsh = {
     enable = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     shellAliases = {
       web = "google-chrome-stable --disable-gpu &> /dev/null & disown";
