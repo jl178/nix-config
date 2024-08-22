@@ -137,6 +137,8 @@
     WLR_NO_HARDWARE_CURSORS = "1";
     NIXOS_OZONE_WL = "1";
   };
+  system.autoUpgrade.enable  = true;
+  system.autoUpgrade.allowReboot  = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
