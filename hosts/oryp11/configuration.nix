@@ -49,6 +49,7 @@
   networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
   networking.extraHosts = ''
     54.227.20.253 registry-1.docker.io
+    104.16.103.207 production.cloudflare.docker.com
   '';
   networking.enableIPv6 = false;
   boot.kernelParams = [ "ipv6.disable=1" ];
