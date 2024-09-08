@@ -87,18 +87,9 @@
               preserve_split = yes # you probably want this
           }
 
-          master {
-              # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
-              new_is_master = true
-          }
-
           gestures {
               # See https://wiki.hyprland.org/Configuring/Variables/ for more
               workspace_swipe = off
-          }
-
-          device:epic mouse V1 {
-              sensitivity = -0.5
           }
 
           windowrulev2 = opacity 0.8 0.8,class:^(kitty)$

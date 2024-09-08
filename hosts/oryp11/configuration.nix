@@ -17,7 +17,13 @@
     mixins-hyprland
     mixins-waybar
     mixins-neovim
+    mixins-plex
   ];
+  fileSystems."/mnt/external-hdd" = {
+    device = "/dev/disk/by-uuid/1028A8FD28A8E348"; # Use UUID for stability
+    fsType = "ntfs-3g";
+    options = [ "defaults" ];
+  };
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -55,7 +61,6 @@
   boot.kernelParams = [ "ipv6.disable=1" ];
   # Set your time zone.
   time.timeZone = "America/Denver";
-
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -85,7 +90,7 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  sound.enable = true;
+  # sound.enable = true;
   hardware.pulseaudio.enable = true;
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
