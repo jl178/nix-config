@@ -10,6 +10,7 @@
     mixins-fonts
     mixins-hyprland
     mixins-waybar
+    mixins-neovim
   ];
 
   # Use the systemd-boot EFI boot loader.
