@@ -53,6 +53,17 @@
           ];
           specialArgs = { inherit inputs; };
         };
+        proxmox-media = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/proxmox/media/configuration.nix
+            utils.nixosModules.autoGenFromInputs
+            home-manager.nixosModules.home-manager
+            agenix.nixosModules.age
+            nixvim.nixosModules.nixvim
+          ];
+          specialArgs = { inherit inputs; };
+        };
         wsl = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
