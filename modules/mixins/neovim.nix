@@ -24,6 +24,7 @@
     ./neovim/toggleterm.nix
     ./neovim/transparent.nix
     ./neovim/web-devicons.nix
+    ./neovim/render-markdown.nix
   ];
   programs.nixvim = {
     config = {
