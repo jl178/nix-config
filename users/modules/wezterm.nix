@@ -42,7 +42,6 @@
       local wezterm = require 'wezterm'
       local config = {}
       local act = wezterm.action
-
       -- In newer versions of wezterm, use the config_builder which will
       -- help provide clearer error messages
       if wezterm.config_builder then
@@ -56,6 +55,7 @@
       -- config.default_cursor_style = 'SteadyUnderline'
       config.window_decorations = "RESIZE"
       config.enable_tab_bar = false
+      config.front_end = "WebGpu"
 
       config.font = wezterm.font("JetBrains Mono Bold")
       config.font_rules = {

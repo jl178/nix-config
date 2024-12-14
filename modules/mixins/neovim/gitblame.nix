@@ -1,8 +1,8 @@
 {
   programs.nixvim.plugins.gitblame = {
     enable = true;
-    delay = 3000;
-    dateFormat = "%r";
-    messageTemplate = " <author>, <date>";
+    settings.delay = 3000;
+    settings.dateFormat = "%r";
+    settings.messageTemplate = " <author>, <date>";
   };
 }

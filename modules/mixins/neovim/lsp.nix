@@ -14,11 +14,11 @@
     servers.cmake.enable = true;
     servers.dockerls.enable = true;
     servers.gopls.enable = true;
-    servers.jdt-language-server.enable = true;
+    servers.jdtls.enable = true;
     servers.jsonls.enable = true;
-    servers.lua-ls.enable = true;
+    servers.lua_ls.enable = true;
     servers.pyright.enable = true;
-    servers.tsserver.enable = true;
+    servers.ts_ls.enable = true;
     servers.yamlls.enable = true;
     servers.terraformls.enable = true;
     servers.tailwindcss.enable = true;

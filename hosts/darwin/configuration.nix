@@ -1,13 +1,14 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 {
   imports = with inputs.self.nixosModules; [ mixins-neovim ];
-
   # Set your time zone
   time.timeZone = "America/Denver";
-  fonts.packages = with pkgs; [ font-awesome nerdfonts ];
+  fonts.packages = [ pkgs.font-awesome ]
+    ++ builtins.filter lib.attrsets.isDerivation
+    (builtins.attrValues pkgs.nerd-fonts);
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = false;
-
+  ids.uids.nixbld = 300;
   services.nix-daemon.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 15;
@@ -66,7 +67,7 @@
   system.defaults.dock.autohide = true;
   # Enable programs
   programs.zsh.enable = true;
-  environment.loginShell = pkgs.zsh;
+  # environment.loginShell = pkgs.zsh;
 
   # User configuration
   # users.defaultUserShell = pkgs.zsh;
@@ -92,4 +93,6 @@
     kitty
     docker-credential-helpers
   ];
+
+  system.stateVersion = 5;
 }

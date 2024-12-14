@@ -1,6 +1,6 @@
 {
-    programs.nixvim.plugins.lualine = {
-        enable = true;
-        theme = "gruvbox-material";
-    };
+  programs.nixvim.plugins.lualine = {
+    enable = true;
+    settings.options.theme = "gruvbox-material";
+  };
 }
