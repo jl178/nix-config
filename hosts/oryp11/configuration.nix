@@ -96,13 +96,18 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
+  services.system76-scheduler.settings.processScheduler.pipewireBoost.enable =
+    true;
+  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.prio =
+    20;
+  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.nice =
+    -15;
+  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioPrio =
+    0;
+  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioClass =
+    "realtime";
+
   services.pipewire.wireplumber.extraConfig.bluetoothEnhancements = {
     "monitor.bluez.properties" = {
       "bluez5.enable-sbc-xq" = true;
@@ -184,6 +189,13 @@
     nwg-look
     moonlight-qt
   ];
+  services.sunshine = {
+    enable = true;
+    autoStart = true;
+    capSysAdmin = true;
+    openFirewall = true;
+  };
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall =

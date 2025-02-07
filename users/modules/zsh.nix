@@ -8,6 +8,8 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       bluetooth = "blueman-manager &> /dev/null & disown";
+      game = "moonlight &> /dev/null & disown";
+      volume = "pavucontrol &> /dev/null & disown";
       volume-increase = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
       volume-decrease = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
       web = "brave &> /dev/null & disown";

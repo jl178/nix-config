@@ -8,9 +8,24 @@
         xwayland.enable = true;
 
         extraConfig = ''
-          monitor=,preferred,auto,1
-          monitor=eDP-1, 1920x1200, auto, 1
-          monitor=HDMI-A-1,preferred,0x0,1
+          # monitor=,preferred,auto,1
+          # monitor=eDP-1, 1920x1200, auto, 1
+          # monitor=HDMI-A-1,preferred,0x0,1
+          monitor=eDP-1,1920x1200,auto,1
+          monitor=HDMI-A-1,preferred,auto,1
+
+            workspace=1
+            workspace=2
+            workspace=3
+            workspace=4
+            workspace=5
+            workspace=6
+            workspace=7
+            workspace=8
+            workspace=9
+            workspace=10
+
+
           exec = brightnessctl set 7
 
           #TODO: Cannot get background working with NixOS natively.
