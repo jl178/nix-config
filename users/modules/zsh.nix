@@ -7,7 +7,10 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     shellAliases = {
-      web = "google-chrome-stable --disable-gpu &> /dev/null & disown";
+      bluetooth = "blueman-manager &> /dev/null & disown";
+      volume-increase = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
+      volume-decrease = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
+      web = "brave &> /dev/null & disown";
       screenshot =
         ''grim -g "$(slurp -o)" $HOME/Pictures/$(date +'%s_grim.png')'';
       snip = ''

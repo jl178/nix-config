@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }: {
-  home = { packages = with pkgs; [ jetbrains-mono kitty ]; };
+  home = { packages = with pkgs; [ jetbrains-mono kitty kitty-themes ]; };
   programs.kitty = {
     enable = true;
-    # theme = "Gruvbox Material Dark Hard";
+    theme = "Gruvbox Material Dark Hard";
     extraConfig = ''
       hide_window_decorations yes
       font_family JetBrains Mono

@@ -2,12 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 {
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
-    mixins-fonts
+    # mixins-fonts
     mixins-nvidia
     # mixins-i3
     # mixins-xorg
@@ -17,13 +17,10 @@
     mixins-hyprland
     mixins-waybar
     mixins-neovim
-    mixins-plex
+    # mixins-plex
   ];
-  fileSystems."/mnt/external-hdd" = {
-    device = "/dev/disk/by-uuid/1028A8FD28A8E348"; # Use UUID for stability
-    fsType = "ntfs-3g";
-    options = [ "defaults" ];
-  };
+  fonts.packages = builtins.filter lib.attrsets.isDerivation
+    (builtins.attrValues pkgs.nerd-fonts);
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -91,7 +88,29 @@
 
   # Enable sound.
   # sound.enable = true;
-  hardware.pulseaudio.enable = true;
+  # Enable sound with pipewire.
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+  services.pipewire.wireplumber.extraConfig.bluetoothEnhancements = {
+    "monitor.bluez.properties" = {
+      "bluez5.enable-sbc-xq" = true;
+      "bluez5.enable-msbc" = true;
+      "bluez5.enable-hw-volume" = true;
+      "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+    };
+  };
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
@@ -105,6 +124,9 @@
     touchpad.clickMethod = "clickfinger";
 
   };
+
+  nixpkgs.config.permittedInsecurePackages =
+    [ "dotnet-sdk-6.0.428" "aspnetcore-runtime-6.0.36" ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
@@ -128,6 +150,7 @@
         mingwSupport = true;
       })
       winetricks
+      brave
     ];
 
   };
@@ -140,6 +163,7 @@
     '';
     wantedBy = [ "multi-user.target" ];
   };
+  hardware.system76.enableAll = true;
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -157,6 +181,8 @@
     brightnessctl
     slurp
     grim
+    nwg-look
+    moonlight-qt
   ];
   programs.steam = {
     enable = true;
@@ -196,5 +222,5 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 }
