@@ -22,6 +22,20 @@
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
 
+  users.groups.openvpn = { };
+  services.openvpn = {
+    servers.nordvpn = {
+      config = "config /etc/openvpn/us6660.nordvpn.com.udp1194.ovpn";
+      autoStart = true; # Ensure it starts on boot
+      updateResolvConf = true;
+    };
+  };
+  services.ollama = {
+    enable = true;
+    # acceleration = "cuda";
+    openFirewall = true;
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -94,19 +108,19 @@
   services.pipewire = {
     enable = true;
     alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
+    # alsa.support32Bit = true;
+    # pulse.enable = true;
   };
-  services.system76-scheduler.settings.processScheduler.pipewireBoost.enable =
-    true;
-  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.prio =
-    20;
-  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.nice =
-    -15;
-  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioPrio =
-    0;
-  services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioClass =
-    "realtime";
+  # services.system76-scheduler.settings.processScheduler.pipewireBoost.enable =
+  #   true;
+  # services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.prio =
+  #   20;
+  # services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.nice =
+  #   -15;
+  # services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioPrio =
+  #   0;
+  # services.system76-scheduler.settings.processScheduler.pipewireBoost.profile.ioClass =
+  #   "realtime";
 
   services.pipewire.wireplumber.extraConfig.bluetoothEnhancements = {
     "monitor.bluez.properties" = {

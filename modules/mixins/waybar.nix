@@ -123,15 +123,14 @@
               font-family: "JetBrainsMono Nerd Font Bold";
               font-size: 25px;
               color: #83a598; /* yellow */
-              border-radius: 10px 0px 0px 10px;
-              border-left: 0px;
-              border-right: 0px;
+              border-radius: 10px 10px 10px 10px;
           }
 
           #clock {
               color: #d79921;
-              border-radius: 0px 10px 10px 0px;
+              border-radius: 10px 10px 10px 10px;
               margin-right: 10px;
+              margin-left: 10px;
           }
 
           #network {
@@ -182,9 +181,9 @@
           }
 
           #custom-weather {
-              border-radius: 0px 10px 10px 0px;
+              border-radius: 10px 10px 10px 10px;
               border-right: 0px;
-              margin-left: 0px;
+              margin-left: 10px;
           }
         '';
         settings = [{
@@ -193,7 +192,8 @@
           position = "top";
           tray = { spacing = 10; };
           modules-center = [ "hyprland/window" ];
-          modules-left = [ "custom/nix" "clock" "hyprland/workspaces" ];
+          modules-left =
+            [ "custom/nix" "clock" "hyprland/workspaces" "custom/weather" ];
           modules-right = [
             "network"
             "bluetooth"
@@ -226,6 +226,12 @@
             tooltip-format = "NixOS";
             on-click = "wezterm";
           };
+
+          "custom/weather" = {
+            format = "{}";
+            exec = "curl -s wttr.in/?format=1";
+            interval = 600;
+          };
           bluetooth = {
             format = " {status}";
             format-disabled = ""; # an empty format will hide the module
@@ -236,7 +242,7 @@
             on-click = "blueman-applet";
           };
           clock = {
-            format = "{: %I:%M %p   %a, %b %e}";
+            format = " {:%H:%M %p | %a, %b %d}";
             format-alt = "{:%Y-%m-%d}";
             tooltip-format = "{:%Y-%m-%d | %H:%M}";
           };
