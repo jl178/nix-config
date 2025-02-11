@@ -20,7 +20,7 @@
       k9s
       # kind
       kubernetes-helm
-      jdk11
+      jdk17
       unzip
       terraform
       ranger
@@ -36,6 +36,10 @@
       mariadb
       airlift
       devbox
+      lombok
+      tree
+      poetry
+      lua
     ];
   };
 }

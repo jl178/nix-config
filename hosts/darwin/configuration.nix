@@ -14,46 +14,90 @@
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 15;
   system.defaults.NSGlobalDomain.KeyRepeat = 3;
   nixpkgs.config.allowUnfree = true;
-  services.yabai.enable = true;
-  services.yabai.extraConfig = ''
-    yabai -m config                                 \
-    mouse_follows_focus          off            \
-    focus_follows_mouse          off            \
-    window_origin_display        default        \
-    window_placement             second_child   \
-    window_zoom_persist          on             \
-    window_topmost               off            \
-    window_shadow                on             \
-    window_animation_duration    0.0            \
-    window_animation_frame_rate  120            \
-    window_opacity_duration      0.0            \
-    active_window_opacity        1.0            \
-    normal_window_opacity        0.90           \
-    window_opacity               off            \
-    insert_feedback_color        0xffd75f5f     \
-    active_window_border_color   0xff775759     \
-    normal_window_border_color   0xff555555     \
-    window_border_width          4              \
-    window_border_radius         12             \
-    window_border_blur           off            \
-    window_border_hidpi          on             \
-    window_border                off            \
-    split_ratio                  0.50           \
-    split_type                   auto           \
-    auto_balance                 off            \
-    top_padding                  20             \
-    bottom_padding               20             \
-    left_padding                 20             \
-    right_padding                20             \
-    window_gap                   12             \
-    layout                       bsp            \
-    mouse_modifier               fn             \
-    mouse_action1                move           \
-    mouse_action2                resize         \
-    mouse_drop_action            swap
+  services.aerospace.enable = true;
+  services.aerospace.settings = {
+    after-startup-command = [ "exec-and-forget sketchybar" ];
+    gaps = {
+      outer.left = 30;
+      outer.bottom = 30;
+      outer.top = 40;
+      outer.right = 30;
+      inner.horizontal = 20;
+      inner.vertical = 20;
+    };
 
-    echo "yabai configuration loaded.."
-  '';
+    mode.main.binding = {
+      cmd-shift-enter =
+        "exec-and-forget osascript -e 'tell application \"Terminal\" do script activate end tell'";
+
+      cmd-h = "focus --boundaries-action wrap-around-the-workspace left";
+      cmd-j = "focus --boundaries-action wrap-around-the-workspace down";
+      cmd-k = "focus --boundaries-action wrap-around-the-workspace up";
+      cmd-l = "focus --boundaries-action wrap-around-the-workspace right";
+
+      cmd-shift-h = "move left";
+      cmd-shift-j = "move down";
+      cmd-shift-k = "move up";
+      cmd-shift-l = "move right";
+
+      cmd-shift-f = "fullscreen";
+
+      cmd-shift-space = "layout floating tiling";
+
+      cmd-1 = "workspace 1";
+      cmd-2 = "workspace 2";
+      cmd-3 = "workspace 3";
+      cmd-4 = "workspace 4";
+      cmd-5 = "workspace 5";
+      cmd-6 = "workspace 6";
+      cmd-7 = "workspace 7";
+      cmd-8 = "workspace 8";
+      cmd-9 = "workspace 9";
+      cmd-0 = "workspace 10";
+
+      cmd-shift-1 = "move-node-to-workspace 1";
+      cmd-shift-2 = "move-node-to-workspace 2";
+      cmd-shift-3 = "move-node-to-workspace 3";
+      cmd-shift-4 = "move-node-to-workspace 4";
+      cmd-shift-5 = "move-node-to-workspace 5";
+      cmd-shift-6 = "move-node-to-workspace 6";
+      cmd-shift-7 = "move-node-to-workspace 7";
+      cmd-shift-8 = "move-node-to-workspace 8";
+      cmd-shift-9 = "move-node-to-workspace 9";
+      cmd-shift-0 = "move-node-to-workspace 10";
+
+      cmd-shift-c = "reload-config";
+
+      cmd-r = "mode resize";
+    };
+
+    mode.resize.binding = {
+      h = "resize width -50";
+      j = "resize height +50";
+      k = "resize height -50";
+      l = "resize width +50";
+      enter = "mode main";
+      esc = "mode main";
+    };
+  };
+
+  # Additional i3-like configuration
+  services.aerospace.settings.enable-normalization-flatten-containers = false;
+  services.aerospace.settings.enable-normalization-opposite-orientation-for-nested-containers =
+    false;
+  services.aerospace.settings.on-focused-monitor-changed =
+    [ "move-mouse monitor-lazy-center" ];
+
+  services.aerospace.settings.exec-on-workspace-change = [
+    "/bin/bash"
+    "-c"
+    "sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE"
+  ];
+  services.sketchybar.enable = true;
+  services.jankyborders.enable = true;
+  services.jankyborders.active_color = "0x99d79921";
+  services.jankyborders.inactive_color = "0xFF282828"; # Solid dark gray
+
   # Home Manager integration
   home-manager = {
     useGlobalPkgs = true;

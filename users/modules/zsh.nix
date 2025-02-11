@@ -43,7 +43,7 @@
       grep = "grep --color=auto";
       ip = "ip --color=auto";
       nix-rebuild-darwin = ''
-        nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake ".#jlittle-mbp"'';
+        nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake ".#jlittle-mbp" --impure'';
     };
 
     initExtra = ''

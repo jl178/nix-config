@@ -6,6 +6,7 @@
     ../modules/tmux.nix
     ../modules/btop.nix
     ../modules/zsh.nix
+    ./sketchybar.nix
     ./desktop.nix
   ];
 
