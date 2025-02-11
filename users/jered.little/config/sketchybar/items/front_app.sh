@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
+source "$CONFIG_DIR/colors.sh"
+
 front_app=(
     icon.background.drawing=on
     icon.drawing=on
+    label.font="$FONT:Bold:14.0" # Make text bold and adjust size
+    background.color="$GREY"
+    background.height=30
     label.color="$LAVENDER"
     display=active
     script="$PLUGIN_DIR/front_app.sh"

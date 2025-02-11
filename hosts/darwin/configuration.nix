@@ -20,16 +20,14 @@
     gaps = {
       outer.left = 30;
       outer.bottom = 30;
-      outer.top = 40;
+      outer.top = 60;
       outer.right = 30;
       inner.horizontal = 20;
       inner.vertical = 20;
     };
 
     mode.main.binding = {
-      cmd-shift-enter =
-        "exec-and-forget osascript -e 'tell application \"Terminal\" do script activate end tell'";
-
+      cmd-enter = "exec-and-forget /run/current-system/sw/bin/wezterm start";
       cmd-h = "focus --boundaries-action wrap-around-the-workspace left";
       cmd-j = "focus --boundaries-action wrap-around-the-workspace down";
       cmd-k = "focus --boundaries-action wrap-around-the-workspace up";
@@ -91,7 +89,7 @@
   services.aerospace.settings.exec-on-workspace-change = [
     "/bin/bash"
     "-c"
-    "sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE"
+    "/run/current-system/sw/bin/sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$(/run/current-system/sw/bin/aerospace list-workspaces --focused)"
   ];
   services.sketchybar.enable = true;
   services.jankyborders.enable = true;

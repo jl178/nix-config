@@ -2,7 +2,7 @@
 
 source "$CONFIG_DIR/colors.sh"
 
-PERCENTAGE="$(pmset -g batt | grep -Po "\d+%" | cut -d% -f1)"
+PERCENTAGE="$(pmset -g batt | grep -o "[0-9]\+%" | cut -d% -f1)"
 CHARGING="$(pmset -g batt | grep 'AC Power')"
 
 if [ "$PERCENTAGE" = "" ]; then
@@ -11,20 +11,21 @@ fi
 
 case ${PERCENTAGE} in
 [3-9][0-9] | 100)
-    COLOR=$BATTERY
+    COLOR=$GREEN
+    OUTPUT=" ${PERCENTAGE}%"
     ;;
 [1-2][0-9])
-    COLOR=$BATTERY_WARNING
+    COLOR=$YELLOW
+    OUTPUT=" ${PERCENTAGE}%"
     ;;
 [0-9])
-    COLOR=$BATTERY_CRITICAL
+    COLOR=$RED
+    OUTPUT=" ${PERCENTAGE}%"
     ;;
 esac
 
-OUTPUT="${PERCENTAGE}%"
-
 if [[ "$CHARGING" != "" ]]; then
-    OUTPUT="${PERCENTAGE}^"
+    OUTPUT=" ${PERCENTAGE}%"
 fi
 
-sketchybar --set "$NAME" label="B ⋮ $OUTPUT" "label.color=$COLOR"
+sketchybar --set "$NAME" label="$OUTPUT" "label.color=$COLOR"

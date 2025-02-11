@@ -15,7 +15,7 @@ AEROSPACE_LIST_OF_WINDOWS_IN_FOCUSED_MONITOR=$(aerospace list-windows --workspac
 
 # Setting up the general bar appearance of the bar
 bar=(
-    height=20
+    height=50
     notch_display_height=42
     notch_offset=-7
     shadow=off
@@ -62,6 +62,7 @@ defaults=(
     # popup
     popup.background.border_width=2
     popup.background.corner_radius=9
+    background.color=$BAR_COLOR
     popup.background.color=$POPUP_BACKGROUND_COLOR
     popup.blur_radius=20
     popup.background.shadow.drawing=on
@@ -70,9 +71,11 @@ defaults=(
 )
 
 sketchybar --default "${defaults[@]}"
+sketchybar --bar color=0x001d2021
 
 # Left
 source "$ITEM_DIR/spaces.sh"
+# source "$ITEM_DIR/weather.sh"
 source "$ITEM_DIR/front_app.sh"
 
 # Right

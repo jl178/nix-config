@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10" "11")
+SPACE_ICONS=(" " " " " " " " " " " " " " " " " " " " " ")
 
 sketchybar --add event aerospace_workspace_change
 
@@ -20,7 +20,7 @@ SKETCHYBAR_DISPLAY=$((TARGET_MONITOR - 1))
 for i in $(aerospace list-workspaces --monitor "$TARGET_MONITOR"); do
     sid=$i
     name_idx=$((i - 1))
-    name=${SPACE_ICONS[$name_idx]}
+    name=
 
     space=(
         space="$sid"
@@ -46,14 +46,12 @@ for i in $(aerospace list-workspaces --monitor "$TARGET_MONITOR"); do
 done
 
 # Hide empty workspaces from the other monitor
-for m in "${monitors[@]}"; do
-    if [[ "$m" != "$TARGET_MONITOR" ]]; then
-        for i in $(aerospace list-workspaces --monitor "$m" --empty); do
-            echo "HIDING ${i}"
-            sketchybar --set "space.$i" "display=0"
-        done
-    fi
-done
+# for m in "${monitors[@]}"; do
+#     for i in $(aerospace list-workspaces --monitor "$m" --empty); do
+#         echo "HIDING ${i}"
+#         sketchybar --set "space.$i" "display=0"
+#     done
+# done
 
 # Space Creator (remains the same)
 space_creator=(
