@@ -1,8 +1,9 @@
 { config, pkgs, lib, ... }: {
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware = {
-    opengl.enable = true;
-    nvidia.modesetting.enable = true;
-    nvidia.open = true;
+
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = true;
+    open = false; # Use proprietary drivers
   };
 }

@@ -24,13 +24,15 @@
             workspace=8
             workspace=9
             workspace=10
-
-
           exec = brightnessctl set 7
 
           #TODO: Cannot get background working with NixOS natively.
           exec = swaybg -m fill -i ~/.background-image
+          cursor {
 
+          no_hardware_cursors = true
+
+          }
           input {
               kb_layout = us
               kb_variant =
