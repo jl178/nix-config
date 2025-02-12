@@ -27,7 +27,8 @@
     };
 
     mode.main.binding = {
-      cmd-enter = "exec-and-forget /run/current-system/sw/bin/wezterm start";
+      cmd-shift-enter =
+        "exec-and-forget /run/current-system/sw/bin/wezterm start";
       cmd-h = "focus --boundaries-action wrap-around-the-workspace left";
       cmd-j = "focus --boundaries-action wrap-around-the-workspace down";
       cmd-k = "focus --boundaries-action wrap-around-the-workspace up";
