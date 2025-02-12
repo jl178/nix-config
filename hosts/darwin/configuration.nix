@@ -9,12 +9,13 @@
     (builtins.attrValues pkgs.nerd-fonts);
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = false;
   ids.uids.nixbld = 300;
-  services.nix-daemon.enable = true;
+  nix.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 15;
   system.defaults.NSGlobalDomain.KeyRepeat = 3;
   nixpkgs.config.allowUnfree = true;
   services.aerospace.enable = true;
+  ids.gids.nixbld = 30000;
   services.aerospace.settings = {
     after-startup-command = [ "exec-and-forget sketchybar" ];
     gaps = {
