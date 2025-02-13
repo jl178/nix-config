@@ -8,6 +8,10 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       bluetooth = "blueman-manager &> /dev/null & disown";
+      increase-laptop-resolution =
+        ''hyprctl keyword monitor "eDP-1,1920x1200,60,1.5"'';
+      decrease-laptop-resolution =
+        ''hyprctl keyword monitor "eDP-1,1920x1200,60,1.0"'';
       game = "moonlight &> /dev/null & disown";
       volume = "pavucontrol &> /dev/null & disown";
       volume-increase = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
@@ -88,6 +92,9 @@
       PROMPT='%B%F{green}[%n%f@%F{green}%m]%f %F{blue} %1~%f%b ''${vcs_info_msg_0_}
       ❯ '
       set -o vi
+      export GDK_SCALE=1
+      export GDK_DPI_SCALE=1
+      export QT_SCALE_FACTOR=1
     '';
   };
 }
