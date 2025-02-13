@@ -11,8 +11,10 @@
           # monitor=,preferred,auto,1
           # monitor=eDP-1, 1920x1200, auto, 1
           # monitor=HDMI-A-1,preferred,0x0,1
-          monitor=eDP-1,1920x1200,auto,1
+          # monitor=eDP-1,1920x1200,auto,1
+          # monitor=HDMI-A-1,preferred,auto,1
           monitor=HDMI-A-1,preferred,auto,1
+          monitor=eDP-1,disable,if,HDMI-A-1
 
             workspace=1
             workspace=2
@@ -29,9 +31,7 @@
           #TODO: Cannot get background working with NixOS natively.
           exec = swaybg -m fill -i ~/.background-image
           cursor {
-
-          no_hardware_cursors = true
-
+            no_hardware_cursors = true
           }
           input {
               kb_layout = us
@@ -51,7 +51,6 @@
 
           general {
               # See https://wiki.hyprland.org/Configuring/Variables/ for more
-
               gaps_in = 5
               gaps_out = 20
               border_size = 2

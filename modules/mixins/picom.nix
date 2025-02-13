@@ -5,6 +5,7 @@
     home-manager.users.jered = { pkgs, ... }: {
       services.picom = {
         enable = true;
+        vSync = true;
         activeOpacity = 1;
         inactiveOpacity = 0.95;
         fade = true;
