@@ -7,18 +7,32 @@
 {
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
-    # mixins-fonts
     mixins-nvidia
-    # mixins-i3
-    # mixins-xorg
-    # mixins-picom
-    # mixins-polybar
-    mixins-wayland
-    mixins-hyprland
-    mixins-waybar
     mixins-neovim
-    # mixins-plex
   ];
+  specialisation.i3 = {
+    inheritParentConfig = true;
+    configuration = {
+      imports = with inputs.self.nixosModules; [
+        mixins-i3
+        mixins-xorg
+        mixins-picom
+        mixins-polybar
+      ];
+    };
+  };
+  specialisation.hyprland = {
+    inheritParentConfig = true;
+    configuration = {
+      imports = with inputs.self.nixosModules; [
+        mixins-nvidia
+        mixins-wayland
+        mixins-hyprland
+        mixins-waybar
+      ];
+    };
+  };
+
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
 
