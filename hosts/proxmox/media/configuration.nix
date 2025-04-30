@@ -5,7 +5,6 @@
 { config, pkgs, inputs, ... }:
 
 {
-
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
     mixins-fonts

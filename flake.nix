@@ -6,7 +6,8 @@
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nixos-wsl.url = "github:nix-community/nixos-wsl";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-wsl.inputs.flake-utils.follows = "utils";
+        # nixos-wsl.inputs.flake-utils.follows = "flake-utils"; # <-- fix this
+    flake-utils.url = "github:numtide/flake-utils"; # <-- add this
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
