@@ -27,6 +27,16 @@ in {
           sha256 = "sha256-BpwyedIjkXS+bHBsIeCpSoChyWCX5A38ywe71qo3tEI=";
         };
       })
+      (builtins.path {
+        name = "Absolute-Series-Scanner";
+        path = pkgs.fetchFromGitHub {
+          owner = "ZeroQI";
+          repo = "Absolute-Series-Scanner";
+          rev = "8ae47b2583f10554e4c9eff89ab8062c4c64bd14";
+          sha256 = "sha256-BpwyedIjkXS+bHBsIeCpSoChyWCX5A38ywe71qo3tEI=";
+        };
+      })
+
     ];
   };
   networking.firewall = {
@@ -75,6 +85,18 @@ in {
     isSystemUser = true;
     extraGroups = [ "mediagroup" ];
   };
+  users.users.deluge = {
+    isSystemUser = true;
+    extraGroups = [ "mediagroup" ];
+  };
+  users.users.jackett = {
+    isSystemUser = true;
+    extraGroups = [ "mediagroup" ];
+  };
+  users.users.readarr = {
+    isSystemUser = true;
+    extraGroups = [ "mediagroup" ];
+  };
   networking.firewall = {
     allowedTCPPorts = [ 3005 8324 32469 80 443 32400 9117 ];
     allowedUDPPorts = [ 1900 5353 32410 32412 32413 32414 32400 80 443 ];
@@ -99,6 +121,7 @@ in {
     web.enable = true;
     openFirewall = true;
     dataDir = "/var/lib/deluge/";
+    group = "mediagroup";
   };
   services.jackett = {
     enable = true;
@@ -110,4 +133,10 @@ in {
     openFirewall = true;
     dataDir = "/var/lib/readarr/";
   };
+  services.calibre-web = {
+    enable = true;
+    openFirewall = true;
+    listen.ip = "0.0.0.0";
+  };
+  services.netbird.enable = true;
 }
