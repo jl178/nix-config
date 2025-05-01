@@ -2,19 +2,25 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 {
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
-    mixins-fonts
-    mixins-i3
-    mixins-xorg
-    mixins-picom
-    mixins-polybar
+    # mixins-fonts
+    #mixins-i3
+    # mixins-xorg
+    # mixins-picom
+    # mixins-polybar
     mixins-neovim
     mixins-plex
   ];
+
+  services.openssh = { enable = true; };
+
+  fonts.packages = [ pkgs.font-awesome ]
+    ++ builtins.filter lib.attrsets.isDerivation
+    (builtins.attrValues pkgs.nerd-fonts);
   # fileSystems."/mnt/zfs" = {
   #   device =
   #     "5cd8b6f4-bfef-4840-b1f1-47ea7bab3ab9"; # Or the correct device for your setup
