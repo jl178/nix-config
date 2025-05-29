@@ -3,16 +3,16 @@
   # General packages which are used across various programs.
   home = {
     packages = with pkgs; [
-      python310Packages.pip
-      python310Packages.mysqlclient
+      # python310Packages.pip
+      # python310Packages.mysqlclient
       pkg-config
       htop
       # gcc
       # clang
       cmake
       lsd
-      python3
-      nodejs_18
+      python312
+      nodejs_20
       fzf
       ripgrep
       lazygit
