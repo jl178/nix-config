@@ -216,6 +216,8 @@
     grim
     nwg-look
     moonlight-qt
+    wl-clipboard
+    xclip
   ];
   services.sunshine = {
     enable = true;
@@ -223,7 +225,7 @@
     capSysAdmin = true;
     openFirewall = true;
   };
-
+  services.netbird = { enable = true; };
   programs.steam = {
     enable = true;
     remotePlay.openFirewall =
