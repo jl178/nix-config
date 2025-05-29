@@ -1,7 +1,10 @@
 { config, pkgs, inputs, lib, ... }:
 
 {
-  imports = with inputs.self.nixosModules; [ mixins-neovim ];
+  imports = with inputs.self.nixosModules; [
+    mixins-neovim
+    mixins-ollama-darwin
+  ];
   # Set your time zone
   time.timeZone = "America/Denver";
   fonts.packages = [ pkgs.font-awesome ]
@@ -16,6 +19,11 @@
   nixpkgs.config.allowUnfree = true;
   services.aerospace.enable = true;
   ids.gids.nixbld = 30000;
+  services.ollama = {
+    enable = true;
+    models = "/Users/jered.little/.ollama/models";
+    environmentVariables = { OLLAMA_LLM_LIBRARY = "cpu"; };
+  };
   services.aerospace.settings = {
     after-startup-command = [ "exec-and-forget sketchybar" ];
     gaps = {

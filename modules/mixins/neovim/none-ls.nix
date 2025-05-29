@@ -4,7 +4,7 @@
     enableLspFormat = true;
     sources.formatting = {
       black.enable = true;
-      biome.enable = true;
+      # biome.enable = true;
       nixfmt.enable = true;
       # jq.enable = true;
       gofmt.enable = true;

@@ -4,6 +4,7 @@
     lsp-format.enable = true;
     lspkind.enable = true;
     fidget.enable = true;
+    # java.enable = true;
   };
   programs.nixvim.plugins.lsp = {
     enable = true;
@@ -15,7 +16,21 @@
     servers.dockerls.enable = true;
     servers.gopls.enable = true;
     servers.jdtls.enable = true;
-    servers.jsonls.enable = true;
+    servers.jdtls.settings = {
+      root_dir = {
+        __raw = ''
+          require("lspconfig").util.root_pattern(
+          		".git",
+          		"mvnw",
+          		"gradlew",
+          		"pom.xml",
+          		"build.gradle",
+          		"build.gradle.kts"
+          	)(vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))'';
+      };
+    };
+    # servers.java_language_server.enable = true;
+    # servers.jsonls.enable = true;
     servers.lua_ls.enable = true;
     servers.pyright.enable = true;
     servers.ts_ls.enable = true;
@@ -23,7 +38,6 @@
     servers.terraformls.enable = true;
     servers.tailwindcss.enable = true;
     servers.bashls.enable = true;
-    # servers.groovyls.enable = true;
     onAttach = ''
       local nmap = function(keys, func, desc)
         if desc then

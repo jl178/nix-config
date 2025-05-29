@@ -2,6 +2,7 @@
   imports = [
     ./neovim/neo-tree.nix
     ./neovim/lsp.nix
+    ./neovim/avante.nix
     # ./neovim/bufferline.nix
     ./neovim/autopairs.nix
     ./neovim/nvim-cmp.nix

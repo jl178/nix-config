@@ -2,7 +2,7 @@
   programs.nixvim.plugins.lint = {
     enable = true;
     lintersByFt = {
-      json = [ "jsonlint" ];
+      # json = [ "jsonlint" ];
       markdown = [ "vale" ];
       terraform = [ "tflint" "tfsec" ];
       yaml = [ "yamllint" ];
