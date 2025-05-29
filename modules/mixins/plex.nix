@@ -120,6 +120,7 @@ in {
     enable = true;
     web.enable = true;
     openFirewall = true;
+    web.openFirewall = true;
     dataDir = "/var/lib/deluge/";
     group = "mediagroup";
   };
