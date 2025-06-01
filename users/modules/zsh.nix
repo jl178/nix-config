@@ -14,6 +14,7 @@
         ''hyprctl keyword monitor "eDP-1,1920x1200,60,1.0"'';
       game = "moonlight &> /dev/null & disown";
       volume = "pavucontrol &> /dev/null & disown";
+      fix-screen-tearing = "nvidia-settings --assign CurrentMetaMode=\"nvidia-auto-select +0+0 { ForceFullCompositionPipeline = On }\"";
       volume-increase = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
       volume-decrease = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
       web = "brave &> /dev/null & disown";

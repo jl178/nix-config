@@ -218,6 +218,7 @@
     moonlight-qt
     wl-clipboard
     xclip
+    appimage-run
   ];
   services.sunshine = {
     enable = true;
