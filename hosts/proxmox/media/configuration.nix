@@ -18,6 +18,17 @@
 
   services.openssh = { enable = true; };
 
+  services.rpcbind.enable = true;
+  services.nfs.server = {
+    enable = true;
+    exports = ''
+        /mnt/zfs/media 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
+    '';
+  };
+
+    networking.firewall.allowedTCPPorts = [ 111 2049 20048 32765 32768 ];
+    networking.firewall.allowedUDPPorts = [ 111 2049 20048 32765 32768 ];
+
   fonts.packages = [ pkgs.font-awesome ]
     ++ builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
