@@ -65,6 +65,17 @@
           ];
           specialArgs = { inherit inputs; };
         };
+        media-serving = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/media_serving/configuration.nix
+            utils.nixosModules.autoGenFromInputs
+            home-manager.nixosModules.home-manager
+            agenix.nixosModules.age
+            nixvim.nixosModules.nixvim
+          ];
+          specialArgs = { inherit inputs; };
+        };
         wsl = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
