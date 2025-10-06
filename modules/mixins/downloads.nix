@@ -13,54 +13,6 @@ let
     installPhase = "mkdir -p $out; cp -R * $out/";
   };
 in {
-  services.plex = {
-    enable = true;
-    dataDir = "/var/lib/plexmediaserver/";
-    openFirewall = false;
-    extraPlugins = [
-      (builtins.path {
-        name = "Audnexus.bundle";
-        path = pkgs.fetchFromGitHub {
-          owner = "djdembeck";
-          repo = "Audnexus.bundle";
-          rev = "v1.3.2";
-          sha256 = "sha256-BpwyedIjkXS+bHBsIeCpSoChyWCX5A38ywe71qo3tEI=";
-        };
-      })
-      (builtins.path {
-        name = "Absolute-Series-Scanner";
-        path = pkgs.fetchFromGitHub {
-          owner = "ZeroQI";
-          repo = "Absolute-Series-Scanner";
-          rev = "8ae47b2583f10554e4c9eff89ab8062c4c64bd14";
-          sha256 = "sha256-BpwyedIjkXS+bHBsIeCpSoChyWCX5A38ywe71qo3tEI=";
-        };
-      })
-
-    ];
-  };
-  networking.firewall = {
-
-    # Kill switch for VPN. Internet will stop working if openvpn is down
-    # extraCommands = ''
-    #   # Flush the tables. This may cut the system's internet.
-    #   iptables -F
-    # # The default policy, if no other rules match, is to refuse traffic.
-    #   iptables -P OUTPUT DROP
-    #   iptables -P INPUT DROP
-    #   iptables -P FORWARD DROP
-    #
-    #   # Let the VPN client communicate with the outside world.
-    #   iptables -A OUTPUT -j ACCEPT -m owner --gid-owner openvpn
-    #
-    #   # The loopback device is harmless, and TUN is required for the VPN.
-    #   iptables -A OUTPUT -j ACCEPT -o lo
-    #   iptables -A OUTPUT -j ACCEPT -o tun+
-    #       
-    #   # We should permit replies to traffic we've sent out.
-    #   iptables -A INPUT -j ACCEPT -m state --state ESTABLISHED
-    # '';
-  };
   # Define the media group
   users.groups.mediagroup = { };
   users.groups.openvpn = { };
@@ -76,12 +28,7 @@ in {
     isSystemUser = true;
     extraGroups = [ "mediagroup" ];
   };
-
   users.users.sonarr = {
-    isSystemUser = true;
-    extraGroups = [ "mediagroup" ];
-  };
-  users.users.plex = {
     isSystemUser = true;
     extraGroups = [ "mediagroup" ];
   };

@@ -13,7 +13,7 @@
     # mixins-picom
     # mixins-polybar
     mixins-neovim
-    mixins-plex
+    mixins-downloads
   ];
 
   services.openssh = { enable = true; };
