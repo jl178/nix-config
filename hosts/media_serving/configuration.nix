@@ -4,7 +4,7 @@
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
     mixins-neovim
-    mixins-plexv2
+    mixins-plex
   ];
 
   services.openssh = { enable = true; };
