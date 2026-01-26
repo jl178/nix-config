@@ -24,6 +24,7 @@
     models = "/Users/jered.little/.ollama/models";
     environmentVariables = { OLLAMA_LLM_LIBRARY = "cpu"; };
   };
+  system.primaryUser = "jered.little";
   services.aerospace.settings = {
     after-startup-command = [ "exec-and-forget sketchybar" ];
     gaps = {
@@ -130,17 +131,17 @@
         # macOS compatible packages
       ];
   };
-  environment.variables = {
-    NIX_LDFLAGS =
-      "-F${pkgs.darwin.apple_sdk.frameworks.CoreFoundation}/Library/Frameworks -framework CoreFoundation $NIX_LDFLAGS";
-  };
+  # environment.variables = {
+  #   NIX_LDFLAGS =
+  #     "-F${pkgs.darwin.apple_sdk.frameworks.CoreFoundation}/Library/Frameworks -framework CoreFoundation $NIX_LDFLAGS";
+  # };
   # List packages installed in system profile
   environment.systemPackages = with pkgs; [
     vim
     git
     mktemp
-    darwin.apple_sdk.frameworks.System
-    darwin.apple_sdk.frameworks.CoreFoundation
+    # darwin.apple_sdk.frameworks.System
+    # darwin.apple_sdk.frameworks.CoreFoundation
     wezterm
     kitty
     docker-credential-helpers
