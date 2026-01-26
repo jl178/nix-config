@@ -6,7 +6,7 @@ in {
     home-manager.users.jered = { pkgs, ... }: {
       xsession.windowManager.i3 = {
         enable = true;
-        package = pkgs.i3-gaps;
+        package = pkgs.i3;
         extraConfig = ''
           # needed for dual screens
           # exec xrandr --output eDP-1-1 --auto --left-of HDMI-0 &

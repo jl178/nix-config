@@ -10,7 +10,7 @@
     };
   };
   environment.systemPackages = with pkgs; [
-    nodePackages.jsonlint
+    # nodePackages.jsonlint
     vale
     tflint
     tfsec
