@@ -2,7 +2,13 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, lib, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 
 {
   imports = with inputs.self.nixosModules; [
@@ -16,23 +22,38 @@
     mixins-downloads
   ];
 
-  services.openssh = { enable = true; };
- virtualisation.docker.enable = true;
+  services.openssh = {
+    enable = true;
+  };
+  virtualisation.docker.enable = true;
 
   services.rpcbind.enable = true;
   services.nfs.server = {
     enable = true;
     exports = ''
-        /mnt/zfs/media 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
+      /mnt/zfs/media 192.168.0.0/24(rw,sync,no_subtree_check,no_root_squash)
     '';
   };
 
-    networking.firewall.allowedTCPPorts = [ 111 2049 20048 32765 32768 ];
-    networking.firewall.allowedUDPPorts = [ 111 2049 20048 32765 32768 ];
+  networking.firewall.allowedTCPPorts = [
+    111
+    2049
+    20048
+    32765
+    32768
+  ];
+  networking.firewall.allowedUDPPorts = [
+    111
+    2049
+    20048
+    32765
+    32768
+  ];
 
-  fonts.packages = [ pkgs.font-awesome ]
-    ++ builtins.filter lib.attrsets.isDerivation
-    (builtins.attrValues pkgs.nerd-fonts);
+  fonts.packages = [
+    pkgs.font-awesome
+  ]
+  ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   # fileSystems."/mnt/zfs" = {
   #   device =
   #     "5cd8b6f4-bfef-4840-b1f1-47ea7bab3ab9"; # Or the correct device for your setup
@@ -126,11 +147,14 @@
   users.users.jered = {
     isNormalUser = true;
     description = "jered";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    packages = with pkgs;
-      [
-        #  thunderbird
-      ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
+    packages = with pkgs; [
+      #  thunderbird
+    ];
   };
 
   # Install firefox.
@@ -141,11 +165,10 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs;
-    [
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
-    ];
+  environment.systemPackages = with pkgs; [
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
+  ];
   services.sunshine = {
     enable = true;
     autoStart = true;
@@ -179,4 +202,30 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 
+  networking.firewall = {
+    enable = true;
+    extraCommands = ''
+      # Default deny outbound
+      iptables -P OUTPUT DROP
+
+      # Allow loopback
+      iptables -A OUTPUT -o lo -j ACCEPT
+
+      # Allow established connections
+      iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+      # Allow VPN tunnel traffic
+      iptables -A OUTPUT -o tun0 -j ACCEPT
+
+      # ✅ Allow LAN access
+      iptables -A OUTPUT -o ens18 -d 192.168.0.0/24 -j ACCEPT
+
+      # ✅ Allow OpenVPN handshake
+      iptables -A OUTPUT -o ens18 -p udp --dport 1194 -j ACCEPT
+    '';
+
+    extraStopCommands = ''
+      iptables -P OUTPUT ACCEPT
+    '';
+  };
 }
