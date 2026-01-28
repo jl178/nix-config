@@ -17,6 +17,7 @@
   ];
 
   services.openssh = { enable = true; };
+ virtualisation.docker.enable = true;
 
   services.rpcbind.enable = true;
   services.nfs.server = {
@@ -125,7 +126,7 @@
   users.users.jered = {
     isNormalUser = true;
     description = "jered";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs;
       [
         #  thunderbird
