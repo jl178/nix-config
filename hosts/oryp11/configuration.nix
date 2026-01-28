@@ -2,7 +2,13 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, inputs, lib, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  lib,
+  ...
+}:
 
 {
   imports = with inputs.self.nixosModules; [
@@ -33,13 +39,12 @@
     };
   };
 
-  fonts.packages = builtins.filter lib.attrsets.isDerivation
-    (builtins.attrValues pkgs.nerd-fonts);
+  fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
 
   users.groups.openvpn = { };
   services.openvpn = {
     servers.nordvpn = {
-      config = "config /etc/openvpn/us6660.nordvpn.com.udp1194.ovpn";
+      config = "config /etc/openvpn/us5078.nordvpn.com.udp.ovpn";
       autoStart = true; # Ensure it starts on boot
       updateResolvConf = true;
     };
@@ -53,7 +58,10 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   home-manager = {
     useGlobalPkgs = true;
@@ -75,9 +83,12 @@
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable =
-    true; # Easiest to use and most distros use this by default.
-  networking.nameservers = [ "8.8.8.8" "8.8.4.4" "1.1.1.1" ];
+  networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
+  networking.nameservers = [
+    "8.8.8.8"
+    "8.8.4.4"
+    "1.1.1.1"
+  ];
   networking.extraHosts = ''
     54.227.20.253 registry-1.docker.io
     104.16.103.207 production.cloudflare.docker.com
@@ -141,7 +152,12 @@
       "bluez5.enable-sbc-xq" = true;
       "bluez5.enable-msbc" = true;
       "bluez5.enable-hw-volume" = true;
-      "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+      "bluez5.roles" = [
+        "hsp_hs"
+        "hsp_ag"
+        "hfp_hf"
+        "hfp_ag"
+      ];
     };
   };
   hardware.bluetooth.enable = true;
@@ -158,8 +174,10 @@
 
   };
 
-  nixpkgs.config.permittedInsecurePackages =
-    [ "dotnet-sdk-6.0.428" "aspnetcore-runtime-6.0.36" ];
+  nixpkgs.config.permittedInsecurePackages = [
+    "dotnet-sdk-6.0.428"
+    "aspnetcore-runtime-6.0.36"
+  ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.defaultUserShell = pkgs.zsh;
@@ -175,8 +193,11 @@
   };
   users.users.jered = {
     isNormalUser = true;
-    extraGroups =
-      [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [
+      "wheel"
+      "docker"
+      "nixosgroup"
+    ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       (wineWowPackages.full.override {
         wineRelease = "staging";
@@ -226,13 +247,13 @@
     capSysAdmin = true;
     openFirewall = true;
   };
-  services.netbird = { enable = true; };
+  services.netbird = {
+    enable = true;
+  };
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall =
-      true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall =
-      true; # Open ports in the firewall for Source Dedicated Server
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -253,6 +274,40 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  networking.firewall = {
+    enable = true;
+
+    # Do NOT open generic ports
+    allowedTCPPorts = [ ];
+    allowedUDPPorts = [ ];
+
+    # Kill switch rules
+    extraCommands = ''
+      # Default deny outbound
+      iptables -P OUTPUT DROP
+
+      # Allow loopback
+      iptables -A OUTPUT -o lo -j ACCEPT
+
+      # Allow established connections
+      iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+      # Allow VPN tunnel traffic
+      iptables -A OUTPUT -o tun0 -j ACCEPT
+
+      # ✅ Allow LAN access even if VPN is down
+      iptables -A OUTPUT -o eno0 -d 192.168.0.0/24 -j ACCEPT
+
+      # Allow OpenVPN handshake
+      iptables -A OUTPUT -o eno0 -p udp --dport 1194 -j ACCEPT
+    '';
+
+    extraStopCommands = ''
+      # Restore connectivity on shutdown / rollback
+      iptables -P OUTPUT ACCEPT
+    '';
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
