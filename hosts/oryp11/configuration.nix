@@ -27,6 +27,7 @@
       ];
     };
   };
+    programs.nix-ld.enable = true;
   specialisation.hyprland = {
     inheritParentConfig = true;
     configuration = {
@@ -35,6 +36,15 @@
         mixins-wayland
         mixins-hyprland
         mixins-waybar
+      ];
+    };
+  };
+  specialisation.gnome = {
+    inheritParentConfig = true;
+    configuration = {
+      imports = with inputs.self.nixosModules; [
+        mixins-nvidia
+        mixins-gnome
       ];
     };
   };
@@ -51,6 +61,7 @@
   };
   services.ollama = {
     enable = true;
+    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.ollama;
     # acceleration = "cuda";
     openFirewall = true;
   };
@@ -89,10 +100,10 @@
     "8.8.4.4"
     "1.1.1.1"
   ];
-  networking.extraHosts = ''
-    54.227.20.253 registry-1.docker.io
-    104.16.103.207 production.cloudflare.docker.com
-  '';
+  # networking.extraHosts = ''
+  #   54.227.20.253 registry-1.docker.io
+  #   104.16.103.207 production.cloudflare.docker.com
+  # '';
   networking.enableIPv6 = false;
   boot.kernelParams = [ "ipv6.disable=1" ];
   # Set your time zone.
@@ -285,7 +296,7 @@
     # Kill switch rules
     extraCommands = ''
       # Default deny outbound
-      iptables -P OUTPUT DROP
+      # iptables -P OUTPUT DROP
 
       # Allow loopback
       iptables -A OUTPUT -o lo -j ACCEPT

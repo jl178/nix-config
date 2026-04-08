@@ -2,6 +2,7 @@
   description = "NixOS configuration";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-latest.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs2305.url = "github:nixos/nixpkgs/nixos-23.05";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     nixos-wsl.url = "github:nix-community/nixos-wsl";
@@ -27,7 +28,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs2305, nixos-hardware, nixos-wsl, nixvim
+  outputs = { self, nixpkgs, nixpkgs-latest, nixpkgs2305, nixos-hardware, nixos-wsl, nixvim
     , home-manager, agenix, darwin, utils, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
