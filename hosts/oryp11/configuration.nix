@@ -61,7 +61,7 @@
   };
   services.ollama = {
     enable = true;
-    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.ollama;
+    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.ollama-cuda;
     # acceleration = "cuda";
     openFirewall = true;
   };
