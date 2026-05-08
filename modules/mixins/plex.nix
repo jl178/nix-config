@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   audiobooksPlugin = pkgs.stdenv.mkDerivation {
@@ -15,6 +15,7 @@ let
 in {
   services.plex = {
     enable = true;
+    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.plex;
     dataDir = "/var/lib/plexmediaserver/";
     openFirewall = false;
     extraPlugins = [
