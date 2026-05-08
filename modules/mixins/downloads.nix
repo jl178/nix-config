@@ -103,10 +103,10 @@ in
     openFirewall = true;
     dataDir = "/var/lib/readarr/";
   };
-  services.calibre-web = {
-    enable = true;
-    openFirewall = true;
-    listen.ip = "0.0.0.0";
-  };
+  # services.calibre-web = {
+  #   enable = true;
+  #   openFirewall = true;
+  #   listen.ip = "0.0.0.0";
+  # };
   services.netbird.enable = true;
 }
