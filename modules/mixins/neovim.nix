@@ -31,7 +31,7 @@
     config = {
       enable = true;
       globals.mapleader = " ";
-      options = {
+      opts = {
         foldlevel = 999;
         number = true;
         relativenumber = true;

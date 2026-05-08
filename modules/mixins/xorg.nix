@@ -2,16 +2,14 @@
   environment.pathsToLink =
     [ "/libexec" ]; # links /libexec from derivations to /run/current-system/sw
   services.xserver = {
-    layout = "us";
     enable = true;
     dpi = 90;
+    xkb.layout = "us";
 
     desktopManager = {
       xterm.enable = false;
       wallpaper.mode = "fill";
     };
-
-    displayManager = { defaultSession = "none+i3"; };
 
     windowManager.i3 = {
       enable = true;
@@ -23,6 +21,7 @@
       ];
     };
   };
+  services.displayManager.defaultSession = "none+i3";
   environment.variables = {
     GDK_SCALE = "2";
     GDK_DPI_SCALE = "0.5";

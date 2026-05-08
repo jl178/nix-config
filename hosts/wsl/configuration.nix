@@ -18,6 +18,7 @@
     # mixins-waybar
     # <nixos-wsl/modules>
     inputs.nixos-wsl.nixosModules.wsl
+    mixins-common
     mixins-neovim
   ];
 

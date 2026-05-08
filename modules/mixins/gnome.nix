@@ -1,11 +1,10 @@
 { config, pkgs, lib, ... }: {
-  services.xserver = {
+  services.xserver.enable = true;
+  services.desktopManager.gnome.enable = true;
+
+  services.displayManager.gdm = {
     enable = true;
-    displayManager.gdm = {
-      enable = true;
-      wayland = true;
-    };
-    desktopManager.gnome.enable = true;
+    wayland = true;
   };
 
   environment.sessionVariables = {

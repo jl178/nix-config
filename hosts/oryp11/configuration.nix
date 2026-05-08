@@ -13,6 +13,7 @@
 {
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
+    mixins-common
     mixins-nvidia
     mixins-neovim
   ];
@@ -61,7 +62,7 @@
   };
   services.ollama = {
     enable = true;
-    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.ollama-cuda;
+    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.stdenv.hostPlatform.system}.ollama-cuda;
     # acceleration = "cuda";
     openFirewall = true;
   };
@@ -139,7 +140,7 @@
   # Enable sound.
   # sound.enable = true;
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -175,7 +176,7 @@
   services.blueman.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput = {
+  services.libinput = {
     enable = true;
     touchpad.tapping = true;
     touchpad.naturalScrolling = true;
@@ -224,7 +225,7 @@
   systemd.services.system76power = {
     script = ''
       sleep 5
-      ${config.boot.kernelPackages.system76-power}/bin/system76-power profile battery
+      ${pkgs.system76-power}/bin/system76-power profile battery
     '';
     wantedBy = [ "multi-user.target" ];
   };
@@ -286,6 +287,10 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # VPN kill-switch rules below use iptables syntax. Pin the firewall
+  # backend to iptables explicitly so a future nftables default flip
+  # can't silently break the rules.
+  networking.nftables.enable = false;
   networking.firewall = {
     enable = true;
 

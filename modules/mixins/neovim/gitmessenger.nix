@@ -2,7 +2,7 @@
   programs.nixvim = {
     plugins.gitmessenger = {
       enable = true;
-      floatingWinOps = { border = "rounded"; };
+      settings.floating_win_ops = { border = "rounded"; };
     };
     keymaps = [{
       mode = "n";

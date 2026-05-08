@@ -13,6 +13,7 @@
 {
   imports = with inputs.self.nixosModules; [
     ./hardware-configuration.nix
+    mixins-common
     # mixins-fonts
     #mixins-i3
     # mixins-xorg
@@ -125,7 +126,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -202,6 +203,10 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 
+  # VPN kill-switch rules below use iptables syntax. Pin the firewall
+  # backend to iptables explicitly so a future nftables default flip
+  # can't silently break the rules.
+  networking.nftables.enable = false;
   networking.firewall = {
     enable = true;
     extraCommands = ''

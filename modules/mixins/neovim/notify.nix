@@ -1,10 +1,10 @@
 {
   programs.nixvim.plugins.notify = {
     enable = true;
-    fps = 75;
-    backgroundColour = "#000000";
-    maxWidth = 40;
-    extraOptions = {
+    settings = {
+      fps = 75;
+      background_colour = "#000000";
+      max_width = 40;
       render = "wrapped-compact";
       stages = "slide";
     };

@@ -2,11 +2,13 @@
   programs.nixvim = {
     plugins.neo-tree = {
       enable = true;
-      autoCleanAfterSessionRestore = true;
-      closeIfLastWindow = true;
-      window = { position = "left"; };
-      enableDiagnostics = true;
-      enableGitStatus = true;
+      settings = {
+        auto_clean_after_session_restore = true;
+        close_if_last_window = true;
+        window.position = "left";
+        enable_diagnostics = true;
+        enable_git_status = true;
+      };
     };
     extraConfigLua = ''
       vim.keymap.set('n', '<leader>o', function()

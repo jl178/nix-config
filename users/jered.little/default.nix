@@ -20,9 +20,9 @@
 
   programs.git = {
     enable = true;
-    userEmail = "jeredlittle1996@gmail.com";
-    userName = "Jered Little";
-    extraConfig = {
+    settings = {
+      user.email = "jeredlittle1996@gmail.com";
+      user.name = "Jered Little";
       safe.directory = [ "*" ];
       credential.helper = "! gh auth git-credential";
     };

@@ -51,7 +51,7 @@
         nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin -- switch --flake ".#jlittle-mbp" --impure'';
     };
 
-    initExtra = ''
+    initContent = ''
       # Colored pagers
       export LESS='-R --use-color -Dd+r$Du+b'
       export MANPAGER='less -R --use-color -Dd+r -Du+b'
