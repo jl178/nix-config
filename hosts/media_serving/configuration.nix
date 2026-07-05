@@ -16,20 +16,11 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
-<<<<<<< HEAD
   fileSystems."/mnt/media" = {
     device = "192.168.1.65:/mnt/zfs/media";
     fsType = "nfs";
     options = [ "x-systemd.automount" "noatime" ];
   };
-=======
-  # fileSystems."/mnt/media" = {
-  #   device = "192.168.0.115:/mnt/zfs/media";
-  #   fsType = "nfs";
-  #   options = [ "x-systemd.automount" "noatime" ];
-  # };
->>>>>>> d0c6531 (update media)
-
   # systemd.services.plex.after = [ "mnt-media.mount" ];
   # systemd.services.plex.requires = [ "mnt-media.mount" ];
 
