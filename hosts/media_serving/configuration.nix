@@ -26,6 +26,19 @@
 
   networking.hostName = "nixosv2"; # Define your hostname.
 
+  networking.wireguard.interfaces.wg-vps = {
+    ips = [ "10.9.0.2/24" ];
+    privateKeyFile = "/etc/wireguard/plex.key";
+    peers = [{
+      publicKey = "8CVVG06hMdML0jNHYABstFHtFTE4pv8hEG46bqXdj1k=";
+      endpoint = "149.28.249.116:51820";
+      allowedIPs = [ "10.9.0.1/32" ];
+      persistentKeepalive = 25;
+    }];
+  };
+
+  networking.firewall.allowedTCPPorts = [ 32400 ];
+
   # Enable networking
   networking.networkmanager.enable = true;
 
@@ -111,13 +124,12 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs;
-    [
-      nfs-utils # Provides mount.nfs and showmount
-
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
-    ];
+  environment.systemPackages = with pkgs; [
+    nfs-utils # Provides mount.nfs and showmount
+    wireguard-tools
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
+  ];
 
   services.rpcbind.enable = true;
 
