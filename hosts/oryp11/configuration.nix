@@ -109,6 +109,7 @@
   nixpkgs.config.allowUnfree = true;
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
+  virtualisation.docker.package = pkgs.docker_29;
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;

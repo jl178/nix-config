@@ -27,14 +27,14 @@
       go
       rustc
       cargo
-      docker
+      docker_29
       docker-compose
       glab
       azure-cli
       awscli2
       google-cloud-sdk
       mariadb
-      airlift
+      (airlift.override { docker = docker_29; })
       devbox
       lombok
       tree
