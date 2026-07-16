@@ -8,6 +8,24 @@
   };
   programs.nixvim.plugins.lsp = {
     enable = true;
+    # Work around neovim/neovim#33224: incremental sync's cached buffer snapshot
+    # can desync from the real buffer, after which the next keystroke throws
+    # "attempt to get length of local 'prev_line'" out of vim/lsp/sync.lua.
+    # Full sync never calls compute_diff, so the crash cannot happen.
+    #
+    # This wraps vim.lsp.start rather than setting vim.lsp.config("*"), because
+    # the "*" defaults only reach servers resolved through vim.lsp.enable.
+    # copilot.vim calls vim.lsp.start directly and would otherwise stay on
+    # incremental sync. Drop this once #33224 is fixed.
+    preConfig = ''
+      local __lsp_start = vim.lsp.start
+      vim.lsp.start = function(config, opts)
+        config = vim.tbl_deep_extend("force", config or {}, {
+          flags = { allow_incremental_sync = false },
+        })
+        return __lsp_start(config, opts)
+      end
+    '';
     keymaps.lspBuf = { "<leader>fm" = "format"; };
     servers.nixd.enable = true;
     servers.cssls.enable = true;

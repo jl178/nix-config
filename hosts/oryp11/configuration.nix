@@ -95,7 +95,7 @@
   networking.enableIPv6 = false;
   boot.kernelParams = [ "ipv6.disable=1" ];
   # Set your time zone.
-  time.timeZone = "America/Denver";
+  time.timeZone = "America/Chicago";
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
