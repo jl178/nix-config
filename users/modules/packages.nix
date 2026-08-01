@@ -40,6 +40,7 @@
       tree
       poetry
       lua
+      uv
     ];
   };
 }

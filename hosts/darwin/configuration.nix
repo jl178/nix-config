@@ -3,7 +3,6 @@
 {
   imports = with inputs.self.nixosModules; [
     mixins-neovim
-    mixins-ollama-darwin
   ];
   # Set your time zone
   time.timeZone = "America/Denver";
@@ -11,7 +10,10 @@
     ++ builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
   system.defaults.NSGlobalDomain."com.apple.swipescrolldirection" = false;
-  ids.uids.nixbld = 300;
+  # macOS reclaimed UIDs 301-308 for its own daemons, deleting _nixbld1-8.
+  # Build users now live at 351-382, the post-Sequoia range that stays clear
+  # of Apple's expanding system-daemon UIDs.
+  ids.uids.nixbld = 350;
   nix.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   system.defaults.NSGlobalDomain.InitialKeyRepeat = 15;
@@ -19,11 +21,6 @@
   nixpkgs.config.allowUnfree = true;
   services.aerospace.enable = true;
   ids.gids.nixbld = 30000;
-  services.ollama = {
-    enable = true;
-    models = "/Users/jered.little/.ollama/models";
-    environmentVariables = { OLLAMA_LLM_LIBRARY = "cpu"; };
-  };
   system.primaryUser = "jered.little";
   services.aerospace.settings = {
     after-startup-command = [ "exec-and-forget sketchybar" ];
