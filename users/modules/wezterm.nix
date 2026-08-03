@@ -57,6 +57,10 @@
       config.enable_tab_bar = false
       config.front_end = "WebGpu"
 
+      -- Use macOS's own fullscreen (separate Space, standard animation)
+      -- instead of wezterm's instant undecorated fill. Ignored off macOS.
+      config.native_macos_fullscreen_mode = true
+
       config.font = wezterm.font("JetBrains Mono Bold")
       config.font_rules = {
         {
@@ -86,6 +90,9 @@
         { key = '{', mods = 'ALT',        action = act.ActivateTabRelative(-1) },
         { key = '}', mods = 'ALT',        action = act.ActivateTabRelative(1) },
         { key = "r", mods = "CTRL|SHIFT", action = "DisableDefaultAssignment" },
+        -- window_decorations = "RESIZE" drops the titlebar, and with it the
+        -- green zoom button, so bind macOS's own Ctrl-Cmd-F ourselves.
+        { key = "f", mods = "CMD|CTRL",   action = act.ToggleFullScreen },
       }
       config.window_background_opacity = .95
       config.window_padding = {

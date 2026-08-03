@@ -9,7 +9,7 @@ This repository contains NixOS configurations for various systems, including Nix
 - **`hosts/`**: Contains subdirectories for each target system (`darwin`, `iseries`, `oryp11`, `wsl`), each with its own `configuration.nix` and, where applicable, `hardware-configuration.nix`.
 - **`modules/`**: Custom modules for system configuration, including a `neovim` setup using `nixvim` split across multiple files for each plugin.
 - **`users/`**: User-specific configurations, including dotfiles and package selections. This also has a `modules/` folder for shared dotfile configuration.
-- **`dotfiles/`**: Raw, hand-copyable versions of configs for machines where Nix cannot be installed.
+- **`dotfiles/`**: Raw, hand-copyable versions of configs for machines where Nix cannot be installed, plus `wallpaper/background.png` (the image the mixins expect at `~/.background-image`).
 - **`dev`**: One-liner bootstrap for the dev container (see below).
 
 ## Dev container
