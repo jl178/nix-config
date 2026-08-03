@@ -1,0 +1,244 @@
+#!/usr/bin/env bash
+# One-liner front door to the Nix dev container (hosts/container).
+#
+#   ./dev              install the WezTerm config + alias, build/start the
+#                      container if needed, then drop into a shell inside it
+#   ./dev tmux         same, but attach to a persistent tmux session
+#   ./dev rebuild      rebuild the image and recreate the container
+#   ./dev help         everything else
+#
+# Nix is NOT required on this machine: when the `nix` binary is missing the
+# image is built inside a throwaway nixos/nix container, with the build store
+# kept in a named volume so subsequent builds are incremental.
+#
+# Optional environment overrides:
+#   DEV_IMAGE       image name:tag                (default nix-dev:latest)
+#   DEV_CONTAINER   container + volume prefix     (default nix-dev)
+#   DEV_WORKPLACE   host dir bind-mounted at ~/workplace (default ~/workplace)
+#   DEV_PLATFORM    --platform for build and run  (default: docker's default)
+#   DEV_BUILDER     builder image                 (default nixos/nix:latest)
+#   DEV_DOCKER_SOCK 1 to bind the host docker socket into the container
+#   DEV_SSH_AGENT   1 to forward the Docker Desktop ssh-agent socket
+set -euo pipefail
+
+REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+IMAGE="${DEV_IMAGE:-nix-dev:latest}"
+CONTAINER="${DEV_CONTAINER:-nix-dev}"
+WORKPLACE="${DEV_WORKPLACE:-$HOME/workplace}"
+BUILDER="${DEV_BUILDER:-nixos/nix:latest}"
+BUILD_STORE_VOLUME="${CONTAINER}-buildstore"
+ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
+ALIAS_MARKER="# nix-config dev container"
+
+say() { printf '\033[1;32m==>\033[0m %s\n' "$*" >&2; }
+warn() { printf '\033[1;33m==>\033[0m %s\n' "$*" >&2; }
+die() { printf '\033[1;31m==>\033[0m %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+platform_args() {
+  [ -n "${DEV_PLATFORM:-}" ] && printf '%s\n%s\n' --platform "$DEV_PLATFORM"
+}
+
+require_docker() {
+  have docker || die "docker not found on PATH"
+  docker info >/dev/null 2>&1 || die "docker is installed but not running"
+}
+
+# --- image ------------------------------------------------------------------
+
+image_exists() { docker image inspect "$IMAGE" >/dev/null 2>&1; }
+
+build_image() {
+  # The flake exposes the linux systems only; ask for the one matching the
+  # image we are about to run rather than the host's own system.
+  local system attr
+  case "${DEV_PLATFORM:-$(docker version --format '{{.Server.Os}}/{{.Server.Arch}}')}" in
+    */arm64 | */aarch64) system=aarch64-linux ;;
+    *) system=x86_64-linux ;;
+  esac
+  attr="packages.${system}.devcontainer-stream"
+
+  # `path:` rather than a bare path so the build sees the working tree as-is,
+  # instead of git-flake semantics where uncommitted files are invisible.
+  if have nix; then
+    say "Building $IMAGE with the local nix ($system)"
+    local streamer
+    streamer="$(nix build --no-link --print-out-paths "path:${REPO}#${attr}")"
+    "$streamer" | docker load
+  else
+    say "No local nix; building $IMAGE inside $BUILDER ($system)"
+    # Nix's own logs go to stderr, so stdout is just the image tarball.
+    # shellcheck disable=SC2046
+    docker run --rm -i \
+      $(platform_args) \
+      -v "${REPO}:/repo:ro" \
+      -v "${BUILD_STORE_VOLUME}:/nix" \
+      "$BUILDER" \
+      sh -c 'exec $(nix --extra-experimental-features "nix-command flakes" \
+                       build --no-link --print-out-paths "path:/repo#'"${attr}"'")' \
+      | docker load
+  fi
+}
+
+ensure_image() {
+  if image_exists; then
+    return
+  fi
+  build_image
+}
+
+# --- container --------------------------------------------------------------
+
+container_state() {
+  docker inspect -f '{{.State.Status}}' "$CONTAINER" 2>/dev/null || echo missing
+}
+
+create_container() {
+  [ -d "$WORKPLACE" ] || { say "Creating $WORKPLACE"; mkdir -p "$WORKPLACE"; }
+
+  local args=(
+    --name "$CONTAINER"
+    --hostname "$CONTAINER"
+    --detach --interactive --tty
+    # host.docker.internal is built in on Docker Desktop; this makes it resolve
+    # on plain Linux docker too, so avante can reach ollama on the host.
+    --add-host "host.docker.internal:host-gateway"
+    -e "TERM=${TERM:-xterm-256color}"
+    -v "${WORKPLACE}:/root/workplace"
+    # State that should outlive `./dev rebuild`. Everything else is baked into
+    # the image and comes back on rebuild.
+    -v "${CONTAINER}-state:/root/.local/state"
+    -v "${CONTAINER}-cache:/root/.cache"
+    -v "${CONTAINER}-gh:/root/.config/gh"
+    -v "${CONTAINER}-copilot:/root/.config/github-copilot"
+  )
+  [ -n "${DEV_PLATFORM:-}" ] && args+=(--platform "$DEV_PLATFORM")
+  [ "${DEV_DOCKER_SOCK:-0}" = 1 ] &&
+    args+=(-v /var/run/docker.sock:/var/run/docker.sock)
+  [ "${DEV_SSH_AGENT:-0}" = 1 ] &&
+    args+=(-v /run/host-services/ssh-auth.sock:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent)
+
+  say "Creating $CONTAINER from $IMAGE (${WORKPLACE} -> /root/workplace)"
+  docker run "${args[@]}" "$IMAGE" >/dev/null
+}
+
+ensure_container() {
+  ensure_image
+  case "$(container_state)" in
+    running) ;;
+    missing) create_container ;;
+    *) say "Starting $CONTAINER"; docker start "$CONTAINER" >/dev/null ;;
+  esac
+}
+
+# --- host-side setup --------------------------------------------------------
+
+install_wezterm_config() {
+  local force="${1:-}" dest="$HOME/.config/wezterm"
+  if [ -e "$dest/wezterm.lua" ] && [ "$force" != "--force" ]; then
+    return
+  fi
+  say "Installing WezTerm config into $dest"
+  mkdir -p "$dest/colors"
+  cp "$REPO/dotfiles/wezterm/wezterm.lua" "$dest/wezterm.lua"
+  cp "$REPO"/dotfiles/wezterm/colors/*.toml "$dest/colors/"
+  warn "WezTerm needs JetBrains Mono: brew install --cask font-jetbrains-mono"
+}
+
+install_alias() {
+  [ -e "$ZSHRC" ] || touch "$ZSHRC"
+  if grep -qF "$ALIAS_MARKER" "$ZSHRC"; then
+    return
+  fi
+  say "Adding 'dev' alias to $ZSHRC"
+  printf '\n%s\nalias dev=%q\n' "$ALIAS_MARKER" "$REPO/dev" >>"$ZSHRC"
+  warn "Run 'source $ZSHRC' (or open a new tab) to pick up the alias"
+}
+
+# --- commands ---------------------------------------------------------------
+
+cmd_shell() { ensure_container; exec docker exec -it "$CONTAINER" /bin/zsh -l; }
+
+cmd_tmux() {
+  ensure_container
+  exec docker exec -it "$CONTAINER" /bin/zsh -lc 'tmux new -A -s main'
+}
+
+cmd_attach() {
+  ensure_container
+  warn "Detach with ctrl-p ctrl-q; ctrl-d would stop the container"
+  exec docker attach "$CONTAINER"
+}
+
+cmd_exec() { ensure_container; exec docker exec -it "$CONTAINER" "$@"; }
+
+cmd_rebuild() {
+  build_image
+  if [ "$(container_state)" != missing ]; then
+    say "Recreating $CONTAINER"
+    docker rm -f "$CONTAINER" >/dev/null
+  fi
+  create_container
+}
+
+cmd_status() {
+  printf 'repo:      %s\n' "$REPO"
+  printf 'image:     %s (%s)\n' "$IMAGE" \
+    "$(image_exists && echo present || echo missing)"
+  printf 'container: %s (%s)\n' "$CONTAINER" "$(container_state)"
+  printf 'workplace: %s -> /root/workplace\n' "$WORKPLACE"
+}
+
+cmd_help() {
+  awk 'NR>1 && /^#/ { sub(/^# ?/, ""); print; next } NR>1 { exit }' \
+    "${BASH_SOURCE[0]}"
+  cat <<'EOF'
+
+Commands:
+  (none)      setup + shell            shell     zsh inside the container
+  tmux        attach tmux session      attach    docker attach to PID 1
+  exec ARGS   run a command inside     status    show what exists
+  build       build the image          rebuild   rebuild image + container
+  start/stop/restart                   rm        remove container + volumes
+  wezterm [--force]  install the WezTerm config
+  alias       add the 'dev' alias to ~/.zshrc
+EOF
+}
+
+main() {
+  local cmd="${1:-default}"
+  [ $# -gt 0 ] && shift
+  case "$cmd" in
+    default)
+      require_docker
+      install_wezterm_config
+      install_alias
+      cmd_shell
+      ;;
+    shell) require_docker; cmd_shell ;;
+    tmux) require_docker; cmd_tmux ;;
+    attach) require_docker; cmd_attach ;;
+    exec) require_docker; cmd_exec "$@" ;;
+    build) require_docker; build_image ;;
+    rebuild) require_docker; cmd_rebuild ;;
+    up) require_docker; ensure_container; cmd_status ;;
+    start) require_docker; docker start "$CONTAINER" ;;
+    stop) require_docker; docker stop "$CONTAINER" ;;
+    restart) require_docker; docker restart "$CONTAINER" ;;
+    rm)
+      require_docker
+      docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+      docker volume rm "${CONTAINER}-state" "${CONTAINER}-cache" \
+        "${CONTAINER}-gh" "${CONTAINER}-copilot" >/dev/null 2>&1 || true
+      say "Removed $CONTAINER and its state volumes"
+      ;;
+    status) require_docker; cmd_status ;;
+    wezterm) install_wezterm_config "${1:-}" ;;
+    alias) install_alias ;;
+    help | -h | --help) cmd_help ;;
+    *) die "unknown command '$cmd' (try ./dev help)" ;;
+  esac
+}
+
+main "$@"

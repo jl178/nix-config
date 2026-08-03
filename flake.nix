@@ -35,7 +35,30 @@
   };
 
   outputs = { self, nixpkgs, nixpkgs-latest, nixos-wsl, nixvim
-    , home-manager, agenix, darwin, utils, aerothemeplasma-nix, ... }@inputs: {
+    , home-manager, agenix, darwin, utils, aerothemeplasma-nix, ... }@inputs:
+    let
+      # Systems the dev container image can be built for. Note that building an
+      # aarch64-linux image from aarch64-darwin needs a Linux builder
+      # (nix.linux-builder.enable) or a remote builder.
+      containerSystems = [ "x86_64-linux" "aarch64-linux" ];
+      forEachContainerSystem = f: nixpkgs.lib.genAttrs containerSystems f;
+
+      containerPkgs = system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+
+      containerHome = system:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = containerPkgs system;
+          modules = [ ./hosts/container/home.nix ];
+          extraSpecialArgs = {
+            inherit inputs;
+            headless = true;
+          };
+        };
+    in {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
         oryp11 = nixpkgs.lib.nixosSystem {
@@ -94,5 +117,28 @@
           specialArgs = { inherit inputs; };
         };
       };
+
+      # Standalone Home Manager generation used by the dev container image.
+      # Also usable directly:
+      #   home-manager switch --flake .#container-x86_64-linux
+      homeConfigurations = nixpkgs.lib.mapAttrs' (system: cfg:
+        nixpkgs.lib.nameValuePair "container-${system}" cfg)
+        (forEachContainerSystem containerHome);
+
+      packages = forEachContainerSystem (system:
+        let
+          mkImage = args:
+            import ./hosts/container/image.nix ({
+              pkgs = containerPkgs system;
+              homeConfiguration = containerHome system;
+            } // args);
+        in rec {
+          # Image tarball: nix build .#devcontainer && docker load < result
+          devcontainer = mkImage { };
+          # Streams the tarball instead of writing it to the store:
+          #   nix run .#devcontainer-stream | docker load
+          devcontainer-stream = mkImage { stream = true; };
+          default = devcontainer;
+        });
     };
 }
