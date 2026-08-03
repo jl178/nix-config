@@ -78,6 +78,12 @@ tmux also gets `default-terminal = tmux-256color` (Home Manager defaults to
 plain `screen`, which costs italics and undercurl inside neovim) and
 `escape-time 10`.
 
+`./dev` passes the host terminal's `TERM` in as `HOST_TERM`, and `.zshenv`
+adopts it only when the image has a matching terminfo entry. The image carries
+ncurses' database — `wezterm`, `alacritty` and the `xterm-*` family are there,
+kitty's `xterm-kitty` is not — so an unknown host `TERM` falls back to
+`xterm-256color` instead of leaving tmux with a terminal it refuses to drive.
+
 ## State
 
 `./dev` bind-mounts `~/workplace` and keeps four named volumes so `./dev

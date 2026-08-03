@@ -90,8 +90,16 @@ ensure_image() {
 
 # --- container --------------------------------------------------------------
 
+# `docker container inspect` writes a stray empty line to stdout when the
+# container does not exist, so key off the exit status rather than the output,
+# and scope to containers so an image of the same name cannot match.
 container_state() {
-  docker inspect -f '{{.State.Status}}' "$CONTAINER" 2>/dev/null || echo missing
+  local out
+  if out="$(docker container inspect -f '{{.State.Status}}' "$CONTAINER" 2>/dev/null)"; then
+    printf '%s' "$out" | tr -d '[:space:]'
+  else
+    printf 'missing'
+  fi
 }
 
 create_container() {
@@ -104,7 +112,6 @@ create_container() {
     # host.docker.internal is built in on Docker Desktop; this makes it resolve
     # on plain Linux docker too, so avante can reach ollama on the host.
     --add-host "host.docker.internal:host-gateway"
-    -e "TERM=${TERM:-xterm-256color}"
     -v "${WORKPLACE}:/root/workplace"
     # State that should outlive `./dev rebuild`. Everything else is baked into
     # the image and comes back on rebuild.
@@ -147,6 +154,13 @@ install_wezterm_config() {
 }
 
 install_alias() {
+  # On a Home Manager machine ~/.zshrc is a read-only store symlink; appending
+  # would fail, and the alias belongs in the nix config there anyway.
+  if [ -L "$ZSHRC" ] && case "$(readlink "$ZSHRC")" in /nix/store/*) true ;; *) false ;; esac; then
+    warn "$ZSHRC is managed by Nix; add the alias there instead:"
+    warn "  alias dev=$REPO/dev"
+    return
+  fi
   [ -e "$ZSHRC" ] || touch "$ZSHRC"
   if grep -qF "$ALIAS_MARKER" "$ZSHRC"; then
     return
@@ -158,11 +172,24 @@ install_alias() {
 
 # --- commands ---------------------------------------------------------------
 
-cmd_shell() { ensure_container; exec docker exec -it "$CONTAINER" /bin/zsh -l; }
+# -t only when there is a terminal to attach to, so `./dev exec ...` still works
+# from a script or a pipeline.
+docker_exec() {
+  # HOST_TERM rather than TERM: the container's .zshenv adopts it only if the
+  # image has a matching terminfo entry, so an exotic host TERM cannot leave
+  # tmux and nvim with a terminal they cannot drive.
+  local flags=(-i -e "HOST_TERM=${TERM:-}")
+  if [ -t 0 ] && [ -t 1 ]; then
+    flags+=(-t)
+  fi
+  exec docker exec "${flags[@]}" "$CONTAINER" "$@"
+}
+
+cmd_shell() { ensure_container; docker_exec /bin/zsh -l; }
 
 cmd_tmux() {
   ensure_container
-  exec docker exec -it "$CONTAINER" /bin/zsh -lc 'tmux new -A -s main'
+  docker_exec /bin/zsh -lc 'tmux new -A -s main'
 }
 
 cmd_attach() {
@@ -171,7 +198,7 @@ cmd_attach() {
   exec docker attach "$CONTAINER"
 }
 
-cmd_exec() { ensure_container; exec docker exec -it "$CONTAINER" "$@"; }
+cmd_exec() { ensure_container; docker_exec "$@"; }
 
 cmd_rebuild() {
   build_image

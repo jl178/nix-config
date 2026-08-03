@@ -37,6 +37,20 @@
     '';
   };
 
+  # `./dev` passes the host terminal's TERM in as HOST_TERM rather than setting
+  # TERM directly: the image only carries ncurses' terminfo database, so an
+  # entry like kitty's xterm-kitty is not there and tmux would refuse to start
+  # with "missing or unsuitable terminal". Adopt it only when it resolves,
+  # otherwise keep the image's own xterm-256color.
+  #
+  # This goes in .zshenv, not .zshrc, so it also applies to the non-interactive
+  # `zsh -lc 'tmux ...'` that `./dev tmux` runs.
+  programs.zsh.envExtra = ''
+    if [ -n "''${HOST_TERM:-}" ] && infocmp "$HOST_TERM" > /dev/null 2>&1; then
+      export TERM="$HOST_TERM"
+    fi
+  '';
+
   programs.nixvim.extraConfigLua = ''
     -- Ship yanks to the macOS clipboard over OSC 52; read pastes back out of
     -- the local register instead of querying the terminal (see clipboard.nix).
