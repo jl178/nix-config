@@ -26,10 +26,16 @@
       url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # AeroThemePlasma (Windows 7 look for KDE Plasma 6). Its flake requires
+    # nixos-unstable, so follow the unstable pin rather than stable nixpkgs.
+    aerothemeplasma-nix = {
+      url = "github:nyakase/aerothemeplasma-nix";
+      inputs.nixpkgs.follows = "nixpkgs-latest";
+    };
   };
 
   outputs = { self, nixpkgs, nixpkgs-latest, nixos-wsl, nixvim
-    , home-manager, agenix, darwin, utils, ... }@inputs: {
+    , home-manager, agenix, darwin, utils, aerothemeplasma-nix, ... }@inputs: {
       nixosModules = import ./modules { lib = nixpkgs.lib; };
       nixosConfigurations = {
         oryp11 = nixpkgs.lib.nixosSystem {

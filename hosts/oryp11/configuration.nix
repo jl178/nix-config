@@ -40,6 +40,15 @@
       imports = with inputs.self.nixosModules; [ mixins-nvidia mixins-gnome ];
     };
   };
+  specialisation.aerothemeplasma = {
+    inheritParentConfig = true;
+    configuration = {
+      imports = with inputs.self.nixosModules; [
+        mixins-nvidia
+        mixins-aerothemeplasma
+      ];
+    };
+  };
 
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
