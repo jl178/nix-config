@@ -119,6 +119,7 @@ create_container() {
     -v "${CONTAINER}-cache:/root/.cache"
     -v "${CONTAINER}-gh:/root/.config/gh"
     -v "${CONTAINER}-copilot:/root/.config/github-copilot"
+    -v "${CONTAINER}-codex:/root/.codex"
   )
   [ -n "${DEV_PLATFORM:-}" ] && args+=(--platform "$DEV_PLATFORM")
   [ "${DEV_DOCKER_SOCK:-0}" = 1 ] &&
@@ -257,7 +258,8 @@ main() {
       require_docker
       docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
       docker volume rm "${CONTAINER}-state" "${CONTAINER}-cache" \
-        "${CONTAINER}-gh" "${CONTAINER}-copilot" >/dev/null 2>&1 || true
+        "${CONTAINER}-gh" "${CONTAINER}-copilot" "${CONTAINER}-codex" \
+        >/dev/null 2>&1 || true
       say "Removed $CONTAINER and its state volumes"
       ;;
     status) require_docker; cmd_status ;;

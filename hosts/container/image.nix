@@ -127,12 +127,19 @@ in mkImage {
     # history, caches and state next to them.
     cp -a ${hm}/home-files/. ${homeRel}/
     find ${homeRel} -type d -exec chmod u+w {} +
-    ln -s ${hm}/home-path ${homeRel}/.nix-profile
+
+    # Deliberately no ~/.nix-profile symlink. Pointing it at the generation's
+    # home-path would resolve into the store, and `home-manager switch` inside
+    # the container then dies with "creating a garbage collector root ... is
+    # forbidden" when it installs packages into the profile directory. Leaving
+    # it absent lets Home Manager create a real profile under
+    # /nix/var/nix/profiles on the first switch; until then /bin already has
+    # every package, so nothing in the home directory depends on it.
 
     # Runtime state and the bind-mount target for the host's ~/workplace.
     mkdir -p ${homeRel}/.cache ${homeRel}/.local/share ${homeRel}/.local/state \
              ${homeRel}/.config/gh ${homeRel}/.config/github-copilot \
-             ${homeRel}/workplace
+             ${homeRel}/.codex ${homeRel}/workplace
   '';
 
   config = {

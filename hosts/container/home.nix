@@ -45,6 +45,10 @@
       gcc
       fd # telescope's file finder
       ncurses # tmux-256color and friends in /share/terminfo
+      # Codex ships far faster than the stable channel tracks it (0.92 vs
+      # 0.144 at time of writing), so take it from the freshness pin, the same
+      # way oryp11 does for ollama-cuda.
+      inputs.nixpkgs-latest.legacyPackages.${pkgs.stdenv.hostPlatform.system}.codex
     ];
     sessionVariables = {
       EDITOR = "nvim";
