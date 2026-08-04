@@ -137,9 +137,20 @@ in mkImage {
     # every package, so nothing in the home directory depends on it.
 
     # Runtime state and the bind-mount target for the host's ~/workplace.
+    #
+    # These are the mount points `./dev` attaches named volumes to. Creating
+    # them here matters: docker seeds a fresh named volume from whatever the
+    # image has at the mount point, so making them now fixes their ownership
+    # and mode — ssh and gnupg refuse to use a world-readable directory.
     mkdir -p ${homeRel}/.cache ${homeRel}/.local/share ${homeRel}/.local/state \
-             ${homeRel}/.config/gh ${homeRel}/.config/github-copilot \
-             ${homeRel}/.codex ${homeRel}/workplace
+             ${homeRel}/.ssh ${homeRel}/.gnupg \
+             ${homeRel}/.aws ${homeRel}/.azure ${homeRel}/.config/gcloud \
+             ${homeRel}/.kube ${homeRel}/.config/k9s ${homeRel}/.config/helm \
+             ${homeRel}/.docker ${homeRel}/.terraform.d ${homeRel}/.m2 \
+             ${homeRel}/.config/gh ${homeRel}/.config/glab-cli \
+             ${homeRel}/.config/github-copilot ${homeRel}/.codex \
+             ${homeRel}/workplace
+    chmod 700 ${homeRel}/.ssh ${homeRel}/.gnupg
   '';
 
   config = {

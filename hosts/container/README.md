@@ -86,19 +86,87 @@ kitty's `xterm-kitty` is not — so an unknown host `TERM` falls back to
 
 ## State
 
-`./dev` bind-mounts `~/workplace` and keeps four named volumes so `./dev
-rebuild` does not throw away credentials or editor state:
+`./dev rebuild` recreates the container and throws away its writable layer, so
+every path holding credentials or long-lived state is a named volume. The list
+lives in the `PERSIST` array at the top of `./dev`; adding one is a single
+line.
 
 | mount | holds |
 | --- | --- |
 | `~/workplace` (bind) | your code |
-| `nix-dev-state` | `~/.local/state` — nvim undo/shada, zsh history |
-| `nix-dev-cache` | `~/.cache` |
-| `nix-dev-gh` | `gh` auth |
-| `nix-dev-copilot` | Copilot auth |
+| `.aws` | config, credentials, and the SSO token cache in `.aws/sso` |
+| `.azure`, `.config/gcloud` | Azure and gcloud logins |
+| `.kube`, `.config/k9s`, `.config/helm` | kubeconfig, k9s config, helm repos |
+| `.terraform.d` | terraform plugin cache and credentials |
+| `.config/gh`, `.config/glab-cli` | GitHub and GitLab auth |
+| `.config/github-copilot`, `.codex` | Copilot and Codex auth |
+| `.docker` | registry logins |
+| `.ssh`, `.gnupg` | keys — created `0700` in the image so the volume inherits it |
+| `.m2` | maven repo |
+| `.local/state`, `.local/share`, `.cache` | nvim undo/shada, zsh history, caches |
 
-Anything else lives in the container's writable layer and is recreated from the
-image on rebuild.
+Two constraints on that list. A volume must not be mounted over a path the
+image bakes (`.zshrc`, `.zshenv`, `.config/{btop,git,nvim,tmux}`): docker seeds
+a fresh volume from the image once and never refreshes it, so you would be
+pinned to a stale copy after every rebuild. And it must be a directory, since
+docker creates a directory at the mount point — a dotfile like `~/.npmrc`
+cannot be persisted this way.
+
+## Sharing host credentials
+
+By default each entry in `PERSIST` is a named volume private to the container,
+so you authenticate once inside it and that survives rebuilds. If you would
+rather the container see credentials you already hold on the host, list the
+names in `DEV_HOST_SHARE` and they bind the host's real directory instead:
+
+```sh
+DEV_HOST_SHARE="aws ssh gcloud kube" ./dev
+```
+
+The host path is `$HOME/<same relative path>`, so `gcloud` binds
+`~/.config/gcloud`. A name whose host directory does not exist falls back to a
+volume with a warning. Changing this only takes effect when the container is
+created, so `./dev rm` first.
+
+## codex login
+
+`codex login` runs its OAuth callback server on `127.0.0.1:1455` inside the
+container and hardcodes `redirect_uri=http://localhost:1455/auth/callback`.
+Docker publishes ports to the container's eth0 rather than its loopback, so a
+plain `-p 1455:1455` cannot reach it — hence the `--device-auth` suggestion
+codex prints when it detects a headless machine.
+
+`./dev codex-login` works around that: it runs `socat` on port 1456 (which
+docker does publish, bound to the host's loopback only) forwarding to codex's
+listener, then starts the login. Open the printed URL on the host and the
+`localhost:1455` redirect lands in the container.
+
+If codex is installed on the host, the simpler route is to authenticate there
+and share the directory — the token in `~/.codex/auth.json` is not machine
+bound:
+
+```sh
+DEV_HOST_SHARE="codex" ./dev
+```
+
+`DEV_CODEX_PORT` changes the host-side port if 1455 is taken.
+
+## Docker in the container
+
+The host's docker socket is bind-mounted by default, so `docker` and `docker
+compose` inside the container drive the host daemon. `DEV_DOCKER_SOCK=0` turns
+it off.
+
+Docker Desktop keeps the socket at `~/.docker/run/docker.sock` and only exposes
+`/var/run/docker.sock` when *Settings → Advanced → "Allow the default Docker
+socket to be used"* is enabled, so `./dev` probes for whichever exists and
+warns if neither does. `DEV_DOCKER_SOCK_PATH` overrides.
+
+The usual caveat applies: the daemon is the host's, so `-v` paths in commands
+you run *inside* the container are resolved on the **host**. `docker run -v
+$(pwd):/x` from `/root/workplace` silently mounts an empty host directory,
+because the Mac has that tree at `/Users/<you>/workplace`. Use the host path
+for volume arguments, or keep to bind-free workflows.
 
 `avante` is pointed at `http://host.docker.internal:11434` so it reaches
 ollama running on the macOS host rather than looking for it inside the
