@@ -140,6 +140,10 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # The shared neovim mixin enables copilot.vim, which is unfree and not wanted
+  # on this host. Disabling it here keeps the mixin usable on the workstations.
+  programs.nixvim.plugins.copilot-vim.enable = lib.mkForce false;
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs;
@@ -187,6 +191,12 @@
   networking.firewall = {
     enable = true;
     extraCommands = ''
+      # The firewall unit reloads on every rebuild and re-runs this script, so
+      # it has to be idempotent or each rebuild appends another copy of every
+      # rule below. Nothing else on this host installs OUTPUT rules.
+      iptables -F OUTPUT
+      ip6tables -F OUTPUT
+
       # Default deny outbound
       iptables -P OUTPUT DROP
 
@@ -202,12 +212,39 @@
       # ✅ Allow LAN access
       iptables -A OUTPUT -o ens18 -d 192.168.1.1/24 -j ACCEPT
 
-      # ✅ Allow OpenVPN handshake
+      # ✅ Allow OpenVPN handshake.
+      # Pinned to the us12680 endpoint. This IP must be updated whenever the
+      # .ovpn file in /etc/openvpn changes, or the tunnel cannot establish.
+      iptables -A OUTPUT -o ens18 -p tcp -d 66.179.142.42 --dport 80 -j ACCEPT
+
+      # Legacy UDP endpoint, unused by the current us12680 TCP config.
       iptables -A OUTPUT -o ens18 -p udp --dport 1194 -j ACCEPT
+
+      # Allow the netbird overlay so local tunnelling keeps working.
+      iptables -A OUTPUT -o wt0 -j ACCEPT
+
+      # IPv6 kill-switch. NordVPN carries no IPv6: the server pushes an IPv4
+      # address and redirect-gateway def1 only, so anything sent over IPv6
+      # leaves via the WAN and exposes the real address. Deny by default and
+      # allow back only what stays on-link or inside a local tunnel.
+      ip6tables -P OUTPUT DROP
+      ip6tables -A OUTPUT -o lo -j ACCEPT
+      ip6tables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      ip6tables -A OUTPUT -o wt0 -j ACCEPT
+
+      # NDP and router advertisements; IPv6 on the LAN stops working without these.
+      ip6tables -A OUTPUT -d fe80::/10 -j ACCEPT
+      ip6tables -A OUTPUT -d ff00::/8 -j ACCEPT
+
+      # LAN prefixes. The global /64 is delegated by the ISP, so it must be
+      # updated here if the ISP rotates the prefix and LAN IPv6 stops working.
+      ip6tables -A OUTPUT -d fdf1:5e61:2b2c::/48 -j ACCEPT
+      ip6tables -A OUTPUT -d 2605:59c8:1d54:d008::/64 -j ACCEPT
     '';
 
     extraStopCommands = ''
       iptables -P OUTPUT ACCEPT
+      ip6tables -P OUTPUT ACCEPT
     '';
   };
 }

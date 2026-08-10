@@ -22,7 +22,7 @@ in
   users.groups.openvpn = { };
   services.openvpn = {
     servers.nordvpn = {
-      config = "config /etc/openvpn/us5078.nordvpn.com.udp.ovpn";
+      config = "config /etc/openvpn/us12680.nordvpn.com.tcp.ovpn";
       autoStart = true; # Ensure it starts on boot
       updateResolvConf = true;
     };
