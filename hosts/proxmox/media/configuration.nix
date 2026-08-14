@@ -19,6 +19,12 @@
 
   services.openssh = { enable = true; };
   virtualisation.docker.enable = true;
+  # nixpkgs still aliases `docker` to docker_28, which is now marked insecure
+  # (unmaintained since November 2025) and refuses to evaluate, so *any*
+  # rebuild of this host failed regardless of what was being changed. Pin the
+  # successor explicitly: 29.4.1 is already the running daemon, so this makes
+  # the config agree with reality rather than allowing an insecure package.
+  virtualisation.docker.package = pkgs.docker_29;
 
   services.rpcbind.enable = true;
   services.nfs.server = {
@@ -184,6 +190,18 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
 
+  # Prefer IPv4 for outbound connections. NordVPN carries no IPv6, so the
+  # kill-switch below denies all global v6 egress; but the LAN still hands
+  # this host a Starlink /64 and a v6 default route via RA, and glibc's
+  # default RFC 3484 table ranks native IPv6 above IPv4. Every client that
+  # resolved to a AAAA therefore tried the one path that cannot work.
+  # Ranking v4-mapped addresses top makes getaddrinfo(3) return IPv4 first,
+  # so traffic takes the tunnel. This is address *selection* only: it opens
+  # no new egress and leaves LAN IPv6 and the netbird overlay untouched.
+  networking.getaddrinfo.precedence = {
+    "::ffff:0:0/96" = 100;
+  };
+
   # VPN kill-switch rules below use iptables syntax. Pin the firewall
   # backend to iptables explicitly so a future nftables default flip
   # can't silently break the rules.
@@ -240,6 +258,15 @@
       # updated here if the ISP rotates the prefix and LAN IPv6 stops working.
       ip6tables -A OUTPUT -d fdf1:5e61:2b2c::/48 -j ACCEPT
       ip6tables -A OUTPUT -d 2605:59c8:1d54:d008::/64 -j ACCEPT
+
+      # Fail closed *fast*. The policy above already denies, but a DROP is
+      # silent: the sender sits in SYN-SENT until its own timeout expires.
+      # .NET's HttpClient has no Happy-Eyeballs fallback, so every Jackett
+      # request to a v6-resolving tracker stalled the full 100s and Sonarr
+      # disabled all indexers. REJECT denies exactly the same traffic but
+      # returns an error immediately, so callers fall back to IPv4 at once.
+      # This must stay last: it is a catch-all after every ACCEPT above.
+      ip6tables -A OUTPUT -j REJECT --reject-with icmp6-adm-prohibited
     '';
 
     extraStopCommands = ''
@@ -247,4 +274,29 @@
       ip6tables -P OUTPUT ACCEPT
     '';
   };
+
+  # Cloudflare-gated trackers (eztv, 1337x) answer Jackett's plain HTTP
+  # request with a challenge page instead of results, which Jackett reports
+  # as "Challenge detected but FlareSolverr is not configured". FlareSolverr
+  # solves the challenge in a headless browser and hands back the cookie.
+  # Deliberately not openFirewall: only Jackett talks to it, over loopback.
+  # Its own outbound requests follow the default route through tun0, so the
+  # kill-switch covers them exactly like Jackett's.
+  services.flaresolverr = {
+    enable = true;
+    port = 8191;
+  };
+
+  # Jackett deliberately tracks the stable pin. 0.24.2200 from nixpkgs-latest
+  # was measured against stable 0.24.2108 side by side and returned identical
+  # result counts (thepiratebay 100, therarbg 50, limetorrents 40), so the
+  # extra input buys nothing here.
+  #
+  # Note for whoever debugs the anime route next: "Unknown indexer:
+  # animetosho" is NOT caused by that choice. Upstream Jackett removed the
+  # animetosho definition somewhere after 0.24.1807, and this flake's stable
+  # nixpkgs is already past that point -- 0.24.2108 and 0.24.2200 both lack
+  # it. The running generation predated the lock bump, which is the only
+  # reason it ever worked. Recovering that route means a different indexer
+  # (nyaa et al), not a Jackett version change.
 }
