@@ -2,7 +2,32 @@
 
 {
   config = {
-    home-manager.users.jered = { pkgs, ... }: {
+    home-manager.users.jered = { pkgs, ... }:
+      let
+        # Proton VPN status for the bar.
+        #
+        # The Proton Linux client brings its tunnel up as a WireGuard
+        # interface via NetworkManager, and the interface name has changed
+        # between releases (pvpn-wg, proton0, wg0...), so match a family of
+        # names rather than a literal one. An interface existing is not
+        # enough on its own -- a half-torn-down tunnel can linger -- so this
+        # also requires the default route to actually run through it. That is
+        # the difference between "the app is open" and "my traffic is going
+        # through the VPN", and only the second one is worth showing.
+        vpnStatus = pkgs.writeShellScript "waybar-vpn-status" ''
+          iface=$(${pkgs.iproute2}/bin/ip -o link show up 2>/dev/null \
+            | ${pkgs.gawk}/bin/awk -F': ' '{print $2}' \
+            | ${pkgs.gnugrep}/bin/grep -E '^(pvpn|proton|wg)' \
+            | head -1)
+          if [ -n "$iface" ] \
+            && ${pkgs.iproute2}/bin/ip route show default 2>/dev/null \
+               | ${pkgs.gnugrep}/bin/grep -q "$iface"; then
+            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected (%s)"}\n' "$iface"
+          else
+            printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic is using your normal connection"}\n'
+          fi
+        '';
+      in {
       programs.waybar = {
         enable = true;
         systemd.enable = true;
@@ -60,6 +85,7 @@
           /* Repeating modules */
 
           #custom-power_profile,
+          #custom-vpn,
           #custom-weather,
           #window,
           #clock,
@@ -133,6 +159,20 @@
               margin-left: 10px;
           }
 
+          #custom-vpn.connected {
+              color: #b8bb26; /* green */
+              border-radius: 10px 0px 0px 10px;
+              border-left: 0px;
+              border-right: 0px;
+          }
+
+          #custom-vpn.disconnected {
+              color: #fb4934; /* red */
+              border-radius: 10px 0px 0px 10px;
+              border-left: 0px;
+              border-right: 0px;
+          }
+
           #network {
               color: #d79921; /* yellow */
               border-radius: 10px 0px 0px 10px;
@@ -195,6 +235,7 @@
           modules-left =
             [ "custom/nix" "clock" "hyprland/workspaces" "custom/weather" ];
           modules-right = [
+            "custom/vpn"
             "network"
             "bluetooth"
             "temperature"
@@ -225,6 +266,13 @@
             format = "󱄅";
             tooltip-format = "NixOS";
             on-click = "wezterm";
+          };
+
+          "custom/vpn" = {
+            exec = "${vpnStatus}";
+            return-type = "json";
+            interval = 5;
+            on-click = "${pkgs.protonvpn-gui}/bin/protonvpn-app";
           };
 
           "custom/weather" = {
