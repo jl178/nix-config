@@ -91,6 +91,23 @@
     }];
   };
 
+  # Read-only access to the tunnel's handshake age for the bar.
+  #
+  # A WireGuard tunnel can sit with its interface up, routes installed and
+  # everything looking healthy while the peer has silently gone away. Nothing
+  # observable from userspace catches that -- only the handshake timestamp
+  # does, and reading it needs CAP_NET_ADMIN. Scoped to exactly this one
+  # read-only query: it exposes a timestamp and nothing else, cannot change
+  # any state, and is narrower than the `wg-quick` sudo entry the common Arch
+  # recipe grants.
+  security.sudo.extraRules = [{
+    users = [ "jered" ];
+    commands = [{
+      command = "${pkgs.wireguard-tools}/bin/wg show proton0 latest-handshakes";
+      options = [ "NOPASSWD" ];
+    }];
+  }];
+
   # Let the waybar toggle start and stop that one unit without a password.
   # Scoped deliberately: this grants nothing beyond wg-quick-proton0, and is
   # narrower than the sudoers entry the common Arch recipe uses.

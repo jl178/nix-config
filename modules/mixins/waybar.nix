@@ -4,25 +4,45 @@
   config = {
     home-manager.users.jered = { pkgs, ... }:
       let
-        # Proton VPN state for the bar.
+        # Proton VPN state for the bar. Three states, not two.
         #
-        # Ask which interface real internet traffic would leave by. `ip route
-        # get` is the only correct way to ask: WireGuard installs an fwmark
-        # rule pointing at a separate, randomly numbered table rather than
-        # replacing the default route, so `ip route show default` still names
-        # eno0 while connected and looks disconnected. Do not "simplify" this
-        # back to reading the default route.
+        # Which interface would traffic leave by? `ip route get` is the only
+        # correct way to ask: WireGuard installs an fwmark rule pointing at a
+        # separate, randomly numbered table rather than replacing the default
+        # route, so `ip route show default` still names eno0 while connected.
+        # Do not "simplify" this back to reading the default route.
+        #
+        # Then, if the tunnel is up, how old is the handshake? A WireGuard
+        # peer can go away with the interface still up, routes still
+        # installed and everything looking fine, while traffic silently
+        # blackholes. The handshake timestamp is the only thing that catches
+        # it. Keepalive is 25s, so anything past ~180s is genuinely wrong
+        # rather than merely idle.
         vpnStatus = pkgs.writeShellScript "waybar-vpn-status" ''
           dev=$(${pkgs.iproute2}/bin/ip route get 1.1.1.1 2>/dev/null \
             | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
           case "$dev" in
-            proton*|pvpn*|wg*)
-              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up - traffic exits via %s. Click to disconnect."}\n' "$dev"
-              ;;
+            proton*|pvpn*|wg*) ;;
             *)
               printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN DOWN - traffic exits via %s. Click to connect."}\n' "''${dev:-unknown}"
+              exit 0
               ;;
           esac
+          hs=$(${pkgs.sudo}/bin/sudo -n ${pkgs.wireguard-tools}/bin/wg show proton0 latest-handshakes 2>/dev/null \
+            | ${pkgs.gawk}/bin/awk '{print $2; exit}')
+          now=$(${pkgs.coreutils}/bin/date +%s)
+          if [ -n "$hs" ] && [ "$hs" -gt 0 ] 2>/dev/null; then
+            age=$((now - hs))
+          else
+            age=-1
+          fi
+          if [ "$age" -ge 0 ] && [ "$age" -le 180 ]; then
+            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s\rhandshake %ss ago\rClick to disconnect."}\n' "$dev" "$age"
+          elif [ "$age" -gt 180 ]; then
+            printf '{"text":" VPN","class":"stale","tooltip":"Tunnel is up but the last handshake was %ss ago - the peer may be gone and traffic may be blackholing.\rClick to reconnect."}\n' "$age"
+          else
+            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s (handshake age unavailable)\rClick to disconnect."}\n' "$dev"
+          fi
         '';
 
         # Click handler: stop the tunnel if it is up, start it if it is not.
@@ -38,6 +58,24 @@
           fi
           sleep 2
           ${pkgs.procps}/bin/pkill -SIGRTMIN+9 waybar || true
+        '';
+
+        # Round-trip time to the internet. On Starlink behind a VPN this is
+        # the number that actually predicts whether a call or a stream will
+        # feel bad, and it separates "the link is struggling" from "something
+        # else is wrong". Fixed width so the bar does not jitter.
+        latency = pkgs.writeShellScript "waybar-latency" ''
+          rtt=$(${pkgs.iputils}/bin/ping -c 2 -W 2 -q 1.1.1.1 2>/dev/null \
+            | ${pkgs.gawk}/bin/awk -F'/' '/rtt|round-trip/ {printf "%.0f", $5; exit}')
+          if [ -z "$rtt" ]; then
+            printf '{"text":"  --","class":"down","tooltip":"No reply from 1.1.1.1"}\n'
+          elif [ "$rtt" -ge 150 ]; then
+            printf '{"text":" %3sms","class":"bad","tooltip":"Round-trip to 1.1.1.1: %sms"}\n' "$rtt" "$rtt"
+          elif [ "$rtt" -ge 80 ]; then
+            printf '{"text":" %3sms","class":"warn","tooltip":"Round-trip to 1.1.1.1: %sms"}\n' "$rtt" "$rtt"
+          else
+            printf '{"text":" %3sms","class":"good","tooltip":"Round-trip to 1.1.1.1: %sms"}\n' "$rtt" "$rtt"
+          fi
         '';
 
         # Public IP and who owns it.
@@ -135,6 +173,7 @@
           #custom-power_profile,
           #custom-vpn,
           #custom-publicip,
+          #custom-latency,
           #custom-weather,
           #window,
           #clock,
@@ -240,6 +279,18 @@
               border-right: 0px;
           }
 
+          #custom-vpn.stale {
+              color: #d79921; /* yellow - up but the handshake has gone stale */
+              border-radius: 10px 0px 0px 10px;
+              border-left: 0px;
+              border-right: 0px;
+          }
+
+          #custom-latency.good { color: #b8bb26; border-radius: 0px; }
+          #custom-latency.warn { color: #d79921; border-radius: 0px; }
+          #custom-latency.bad  { color: #fb4934; border-radius: 0px; }
+          #custom-latency.down { color: #fb4934; border-radius: 0px; }
+
           #custom-vpn.disconnected {
               color: #fb4934; /* red */
               border-radius: 10px 0px 0px 10px;
@@ -316,6 +367,7 @@
           modules-right = [
             "custom/vpn"
             "custom/publicip"
+            "custom/latency"
             "network"
             "bluetooth"
             "temperature"
@@ -356,6 +408,13 @@
             # Right-click opens the Proton app, for picking a server other
             # than the one this tunnel is pinned to.
             on-click-right = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.protonvpn-gui}/bin/protonvpn-app";
+          };
+
+          "custom/latency" = {
+            exec = "${latency}";
+            return-type = "json";
+            interval = 10;
+            signal = 9;
           };
 
           "custom/publicip" = {
@@ -402,7 +461,10 @@
             # tunnel for the same 5 MB transfer. It just tells you nothing.
             # Tunnel state is custom/vpn's job and the exit address is
             # custom/publicip's. This module is here for throughput.
-            format-ethernet = "↑{bandwidthUpBits} ↓{bandwidthDownBits}";
+            # Right-aligned to a fixed width. Without this the bar visibly
+            # resizes every second as the value moves between e.g. "1.2 kb/s"
+            # and "10.6 Mb/s", dragging every module to its right along with it.
+            format-ethernet = "↑{bandwidthUpBits:>9} ↓{bandwidthDownBits:>9}";
             format-linked = "{ifname} (No IP) ";
             format-wifi = "{essid} ({signalStrength}%) ";
           };
