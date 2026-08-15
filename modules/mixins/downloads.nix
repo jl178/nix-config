@@ -91,16 +91,16 @@ in
     dataDir = "/var/lib/deluge/";
     group = "mediagroup";
   };
-  # Jackett is on its way out, replaced by Prowlarr below, but both run for
-  # now: Sonarr and Radarr still point their Torznab indexers at
-  # localhost:9117, and deleting Jackett before those are re-pointed would
-  # take every indexer down at once. Retire it once Prowlarr's sync has
-  # populated the *arrs (Prowlarr -> Settings -> Apps).
-  services.jackett = {
-    enable = true;
-    openFirewall = true;
-    dataDir = "/var/lib/jackett/";
-  };
+  # Jackett is retired. Prowlarr replaced it and the Torznab indexers that
+  # pointed at localhost:9117 have been deleted from both Sonarr and Radarr,
+  # so nothing references it any more. Its state is left at /var/lib/jackett
+  # rather than deleted, in case a definition needs recovering.
+  #
+  # Two indexers were lost in the move and are worth knowing about: therarbg
+  # has no Prowlarr definition at all, and thepiratebay has one but fails
+  # validation. Knaben was added partly to cover that gap -- it is a
+  # meta-search across many trackers rather than a single site.
+  services.jackett.enable = false;
 
   # Prowlarr, indexer manager. Unlike Jackett it pushes indexer definitions
   # into Sonarr/Radarr/Readarr itself rather than being pasted in per app, it
@@ -217,8 +217,22 @@ in
   #   sudo grep -oP '(?<=<ApiKey>)[^<]+' /var/lib/radarr/config.xml \
   #     | sudo tee /etc/recyclarr/radarr-api_key >/dev/null
   #   sudo chmod 0400 /etc/recyclarr/*-api_key
+  # Recyclarr is DISABLED, not removed. Its include-templates do not resolve
+  # with this package/repo combination: 8.6.0 initialises both providers,
+  # clones config-templates completely (61 template yml files present, ids
+  # listed in templates.json), and then fails every lookup with "Unable to
+  # find include template with name ..." -- for prefixed and unprefixed ids
+  # alike, and for templates whose yml demonstrably exists on disk. Stable
+  # 7.4.1 is no better: it wants an includes.json the current repo no longer
+  # ships. Leaving it enabled just means a failing unit every day.
+  #
+  # What it was for -- rejecting junk releases before they reach the download
+  # client -- is partly covered in the meantime by the Sonarr release profile
+  # created via the API ("Anime - prefer English dub"), but that is much
+  # narrower than the TRaSH custom formats. Worth revisiting when nixpkgs
+  # carries a recyclarr whose module and package agree.
   services.recyclarr = {
-    enable = true;
+    enable = false;
     schedule = "daily";
     # Track unstable for this one package. Stable carries 7.4.1, which looks
     # for its template index at repositories/config-templates/includes.json;
