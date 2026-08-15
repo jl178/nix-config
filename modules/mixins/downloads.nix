@@ -19,14 +19,11 @@ in
 {
   # Define the media group
   users.groups.mediagroup = { };
-  users.groups.openvpn = { };
-  services.openvpn = {
-    servers.nordvpn = {
-      config = "config /etc/openvpn/us12680.nordvpn.com.tcp.ovpn";
-      autoStart = true; # Ensure it starts on boot
-      updateResolvConf = true;
-    };
-  };
+  # The VPN tunnel used to be declared here, but it is inseparable from the
+  # kill-switch that pins its interface and endpoint, and splitting the two
+  # across files is how the endpoint pin went stale and took the host offline
+  # (see aa9a300). It now lives beside those rules in the consuming host's
+  # configuration.nix.
   # Add radarr and sonarr to the media group
   users.users.radarr = {
     isSystemUser = true;

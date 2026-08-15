@@ -53,14 +53,15 @@
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
 
-  users.groups.openvpn = { };
-  services.openvpn = {
-    servers.nordvpn = {
-      config = "config /etc/openvpn/us5078.nordvpn.com.udp.ovpn";
-      autoStart = true; # Ensure it starts on boot
-      updateResolvConf = true;
-    };
-  };
+  # VPN is the Proton desktop app (installed below), not a declarative tunnel.
+  # This is a roaming laptop: it needs to pick servers, connect and disconnect
+  # on demand, and survive suspend and network changes, which an always-on
+  # pinned tunnel handles badly. The app manages its own kill-switch and DNS.
+  #
+  # The reverse-path filter must be relaxed or the app's tunnel is dropped by
+  # the firewall; this is the standard NixOS gotcha for Proton's client.
+  # https://discourse.nixos.org/t/how-to-configure-and-use-proton-vpn-on-nixos/65837
+  networking.firewall.checkReversePath = false;
   services.ollama = {
     enable = true;
     package =
@@ -220,6 +221,14 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    # Proton VPN. The GTK app is the supported Linux client and is what logs
+    # in with the Proton *account* credentials; the OpenVPN/IKEv2
+    # username/password pair in the account portal is only for third-party
+    # clients and is not used here. wireguard-tools is required alongside it
+    # because the app negotiates WireGuard rather than shipping its own
+    # userspace implementation.
+    protonvpn-gui
+    wireguard-tools
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     killall
     git
@@ -285,31 +294,17 @@
     allowedTCPPorts = [ ];
     allowedUDPPorts = [ ];
 
-    # Kill switch rules
-    extraCommands = ''
-      # Default deny outbound
-      # iptables -P OUTPUT DROP
-
-      # Allow loopback
-      iptables -A OUTPUT -o lo -j ACCEPT
-
-      # Allow established connections
-      iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-
-      # Allow VPN tunnel traffic
-      iptables -A OUTPUT -o tun0 -j ACCEPT
-
-      # ✅ Allow LAN access even if VPN is down
-      iptables -A OUTPUT -o eno0 -d 192.168.1.1/24 -j ACCEPT
-
-      # Allow OpenVPN handshake
-      iptables -A OUTPUT -o eno0 -p udp --dport 1194 -j ACCEPT
-    '';
-
-    extraStopCommands = ''
-      # Restore connectivity on shutdown / rollback
-      iptables -P OUTPUT ACCEPT
-    '';
+    # No hand-rolled kill-switch here. The block that used to sit at this spot
+    # never enforced anything: its `iptables -P OUTPUT DROP` was commented out,
+    # so the policy stayed ACCEPT and every rule under it was a no-op. It also
+    # referenced tun0 and eno0, neither of which is what the Proton client
+    # brings up. Two competing kill-switches on a roaming laptop produce
+    # breakage that is very hard to attribute, so protection here is the
+    # Proton app's own, toggled in its UI.
+    #
+    # The media host is the opposite case and keeps a real default-deny
+    # kill-switch, because it is headless, always-on, and must never emit a
+    # packet outside its tunnel.
   };
 
   # Copy the NixOS configuration file and link it from the resulting system
