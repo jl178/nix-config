@@ -6,26 +6,31 @@
       let
         # Proton VPN status for the bar.
         #
-        # The Proton Linux client brings its tunnel up as a WireGuard
-        # interface via NetworkManager, and the interface name has changed
-        # between releases (pvpn-wg, proton0, wg0...), so match a family of
-        # names rather than a literal one. An interface existing is not
-        # enough on its own -- a half-torn-down tunnel can linger -- so this
-        # also requires the default route to actually run through it. That is
-        # the difference between "the app is open" and "my traffic is going
-        # through the VPN", and only the second one is worth showing.
+        # Ask which interface real internet traffic would actually leave by,
+        # and check whether that is a Proton tunnel. `ip route get` is the
+        # only correct way to ask: WireGuard does not replace the default
+        # route in the main table, it installs an fwmark rule pointing at a
+        # separate, randomly-numbered table. So while connected, `ip route
+        # show default` still reports eno0 and looks disconnected, while
+        # `ip route get 1.1.1.1` correctly reports proton0. Do not "simplify"
+        # this back to reading the default route.
+        #
+        # The interface name is matched as a family (pvpn*, proton*, wg*)
+        # because Proton has changed it across releases. Verified against this
+        # host that docker0, the br-* bridges and veth* never match, and that
+        # Proton's ipv6leakintrf0 killswitch dummy is not mistaken for the
+        # tunnel.
         vpnStatus = pkgs.writeShellScript "waybar-vpn-status" ''
-          iface=$(${pkgs.iproute2}/bin/ip -o link show up 2>/dev/null \
-            | ${pkgs.gawk}/bin/awk -F': ' '{print $2}' \
-            | ${pkgs.gnugrep}/bin/grep -E '^(pvpn|proton|wg)' \
-            | head -1)
-          if [ -n "$iface" ] \
-            && ${pkgs.iproute2}/bin/ip route show default 2>/dev/null \
-               | ${pkgs.gnugrep}/bin/grep -q "$iface"; then
-            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected (%s)"}\n' "$iface"
-          else
-            printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic is using your normal connection"}\n'
-          fi
+          dev=$(${pkgs.iproute2}/bin/ip route get 1.1.1.1 2>/dev/null \
+            | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
+          case "$dev" in
+            pvpn*|proton*|wg*)
+              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected - traffic exits via %s"}\n' "$dev"
+              ;;
+            *)
+              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic exits via %s"}\n' "''${dev:-unknown}"
+              ;;
+          esac
         '';
       in {
       programs.waybar = {

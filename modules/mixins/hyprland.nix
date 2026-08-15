@@ -37,6 +37,23 @@
 
             #TODO: Cannot get background working with NixOS natively.
             exec = swaybg -m fill -i ~/.background-image
+
+            # Proton VPN, started once at login and left running in the tray.
+            #
+            # There is no minimise on Wayland the way there is on X11 -- the
+            # app is just a floating window -- so the tray is what "minimise"
+            # actually means here: closing the window leaves the client
+            # running and reachable from waybar's tray. Enable "Start
+            # minimised to tray" and "Connect on app start" in the app itself,
+            # and this line makes the whole thing happen at login without a
+            # window ever appearing.
+            exec-once = protonvpn-app
+
+            # Keep it out of the way if it does open a window: float it rather
+            # than letting it claim a tile, and do not steal focus at login.
+            windowrulev2 = float,class:^(protonvpn-app|Proton VPN)$
+            windowrulev2 = noinitialfocus,class:^(protonvpn-app|Proton VPN)$
+            windowrulev2 = center,class:^(protonvpn-app|Proton VPN)$
             cursor {
               no_hardware_cursors = true
             }
