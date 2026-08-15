@@ -103,6 +103,25 @@ in
   # meta-search across many trackers rather than a single site.
   services.jackett.enable = false;
 
+  # SABnzbd, the Usenet download client. Installed ahead of having an
+  # account so the plumbing is ready; it does nothing until a news server is
+  # configured in its UI.
+  #
+  # Usenet is the fix for the class of problem torrents keep producing here:
+  # no swarm means no faked seeder counts, no dead trackers, no DHT-harvested
+  # infohashes that resolve to nobody. A release either exists on the
+  # provider or it does not, and it arrives at line speed.
+  #
+  # In mediagroup so it can hardlink into the libraries rather than copy. The
+  # download directory deliberately sits on /mnt/zfs alongside them - a
+  # cross-filesystem move would force a full copy of every import, which is
+  # exactly the mistake the deluge downloads folder was making.
+  services.sabnzbd = {
+    enable = true;
+    openFirewall = true;
+    group = "mediagroup";
+  };
+
   # Prowlarr, indexer manager. Unlike Jackett it pushes indexer definitions
   # into Sonarr/Radarr/Readarr itself rather than being pasted in per app, it
   # manages Newznab (Usenet) next to Torznab in one place, and its definitions
