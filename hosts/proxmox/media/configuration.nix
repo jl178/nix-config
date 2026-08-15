@@ -211,6 +211,23 @@
     "::ffff:0:0/96" = 100;
   };
 
+  # 8G swapfile. This host has 5.7G of RAM, no swap, and roughly 3.2G of it
+  # permanently spoken for by the media services. Any nix build that is not
+  # fully cached therefore risks the OOM killer: building unrar for SABnzbd
+  # took nix to 2.5G RSS and the kernel killed it mid-switch
+  # ("Out of memory: Killed process ... (nix)"), leaving the rebuild failed
+  # at exit 247. Swap turns that class of failure into merely a slow build.
+  swapDevices = [{
+    device = "/var/swapfile";
+    size = 8192; # MB
+  }];
+
+  # Cap build parallelism for the same reason. Four cores each running a
+  # compile in parallel is what turns a large build into a memory spike this
+  # host cannot absorb; two keeps peak usage survivable without making
+  # rebuilds painfully slow.
+  nix.settings.max-jobs = 2;
+
   # Proton VPN, WireGuard. Replaces the NordVPN OpenVPN tunnel: that ran in
   # userspace over TCP, which stacks two retransmit timers and collapses on a
   # lossy high-RTT link like Starlink, and it died outright whenever the
