@@ -25,10 +25,10 @@
             | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
           case "$dev" in
             pvpn*|proton*|wg*)
-              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected - traffic exits via %s"}\n' "$dev"
+              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected - traffic exits via %s"}\n' "$dev"
               ;;
             *)
-              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic exits via %s"}\n' "''${dev:-unknown}"
+              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic exits via %s"}\n' "''${dev:-unknown}"
               ;;
           esac
         '';
