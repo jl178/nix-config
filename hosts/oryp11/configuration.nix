@@ -54,12 +54,55 @@
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
 
-  # VPN is the Proton desktop app, pulled in by mixins-proton above, not a
-  # declarative tunnel. This is a roaming laptop: it needs to pick servers,
-  # connect and disconnect on demand, and survive suspend and network changes,
-  # which an always-on pinned tunnel handles badly. The app manages its own
-  # kill-switch and DNS. The rp_filter workaround it needs lives in the mixin
-  # beside the package that requires it.
+  # Proton VPN as a declarative WireGuard tunnel, replacing the desktop app
+  # for day-to-day use. The app is still installed via mixins-proton for
+  # picking an unusual country, but it is no longer what carries traffic.
+  #
+  # Why: the app creates its WireGuard connection in NetworkManager on demand
+  # and DELETES it again on disconnect. That makes it impossible to script --
+  # `nmcli con down` works, but there is then nothing left to bring back up,
+  # and the app exposes no CLI and no working DBus activation. A bar toggle
+  # therefore cannot re-connect through it. This is also the shape the wider
+  # community settled on for exactly this reason.
+  #
+  # The tunnel starts at boot (autostart is the default) and is toggled from
+  # waybar via systemctl, which the polkit rule below permits without a
+  # password.
+  #
+  # IPv4 only: this host sets networking.enableIPv6 = false and
+  # ipv6.disable=1, so the v6 address and ::/0 from the generated config are
+  # deliberately omitted rather than configured and then blackholed.
+  #
+  # The private key is NOT in this repo. It lives at /etc/wireguard/proton.key,
+  # 0400 root. Regenerate at account.protonvpn.com -> Downloads -> WireGuard;
+  # the endpoint and public key below must be updated in the same commit.
+  networking.wg-quick.interfaces.proton0 = {
+    address = [ "10.2.0.2/32" ];
+    # Proton's resolver, inside the tunnel. Also required for NetShield (this
+    # config was generated at level 2) to do anything, since it filters at the
+    # DNS layer.
+    dns = [ "10.2.0.1" ];
+    privateKeyFile = "/etc/wireguard/proton.key";
+    peers = [{
+      publicKey = "ZLiSI0SkdK5O0/fhweOpZ2c78F30gWHtsfZcVV0vlj8=";
+      endpoint = "95.173.217.219:51820"; # US-TX#467
+      allowedIPs = [ "0.0.0.0/0" ];
+      persistentKeepalive = 25;
+    }];
+  };
+
+  # Let the waybar toggle start and stop that one unit without a password.
+  # Scoped deliberately: this grants nothing beyond wg-quick-proton0, and is
+  # narrower than the sudoers entry the common Arch recipe uses.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.systemd1.manage-units" &&
+          action.lookup("unit") == "wg-quick-proton0.service" &&
+          subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
   services.ollama = {
     enable = true;
     # Instantiate nixpkgs-latest explicitly rather than reaching into

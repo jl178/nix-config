@@ -4,33 +4,73 @@
   config = {
     home-manager.users.jered = { pkgs, ... }:
       let
-        # Proton VPN status for the bar.
+        # Proton VPN state for the bar.
         #
-        # Ask which interface real internet traffic would actually leave by,
-        # and check whether that is a Proton tunnel. `ip route get` is the
-        # only correct way to ask: WireGuard does not replace the default
-        # route in the main table, it installs an fwmark rule pointing at a
-        # separate, randomly-numbered table. So while connected, `ip route
-        # show default` still reports eno0 and looks disconnected, while
-        # `ip route get 1.1.1.1` correctly reports proton0. Do not "simplify"
-        # this back to reading the default route.
-        #
-        # The interface name is matched as a family (pvpn*, proton*, wg*)
-        # because Proton has changed it across releases. Verified against this
-        # host that docker0, the br-* bridges and veth* never match, and that
-        # Proton's ipv6leakintrf0 killswitch dummy is not mistaken for the
-        # tunnel.
+        # Ask which interface real internet traffic would leave by. `ip route
+        # get` is the only correct way to ask: WireGuard installs an fwmark
+        # rule pointing at a separate, randomly numbered table rather than
+        # replacing the default route, so `ip route show default` still names
+        # eno0 while connected and looks disconnected. Do not "simplify" this
+        # back to reading the default route.
         vpnStatus = pkgs.writeShellScript "waybar-vpn-status" ''
           dev=$(${pkgs.iproute2}/bin/ip route get 1.1.1.1 2>/dev/null \
             | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
           case "$dev" in
-            pvpn*|proton*|wg*)
-              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN connected - traffic exits via %s"}\n' "$dev"
+            proton*|pvpn*|wg*)
+              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up - traffic exits via %s. Click to disconnect."}\n' "$dev"
               ;;
             *)
-              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN NOT connected - traffic exits via %s"}\n' "''${dev:-unknown}"
+              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN DOWN - traffic exits via %s. Click to connect."}\n' "''${dev:-unknown}"
               ;;
           esac
+        '';
+
+        # Click handler: stop the tunnel if it is up, start it if it is not.
+        # systemctl needs privilege, granted narrowly for this single unit by
+        # the polkit rule in hosts/oryp11. Signals waybar afterwards so both
+        # the VPN state and the public IP refresh at once rather than waiting
+        # out their poll intervals.
+        vpnToggle = pkgs.writeShellScript "waybar-vpn-toggle" ''
+          if ${pkgs.systemd}/bin/systemctl is-active --quiet wg-quick-proton0; then
+            ${pkgs.systemd}/bin/systemctl stop wg-quick-proton0
+          else
+            ${pkgs.systemd}/bin/systemctl start wg-quick-proton0
+          fi
+          sleep 2
+          ${pkgs.procps}/bin/pkill -SIGRTMIN+9 waybar || true
+        '';
+
+        # Public IP and who owns it.
+        #
+        # This is deliberately an INDEPENDENT check on the VPN indicator. That
+        # one reasons about routing; this one asks the internet what address it
+        # actually sees and which company owns it. If the two ever disagree,
+        # trust this one -- it is measuring the thing that matters rather than
+        # inferring it.
+        #
+        # P = Proton, S = Starlink/SpaceX, ? = anything else, which is itself
+        # worth noticing. Polled every 5 minutes to stay well inside ipinfo's
+        # free tier, and refreshed on demand by the toggle via SIGRTMIN+9.
+        publicIp = pkgs.writeShellScript "waybar-public-ip" ''
+          resp=$(${pkgs.curl}/bin/curl -4 -s --max-time 6 https://ipinfo.io/json 2>/dev/null)
+          ip=$(printf '%s' "$resp" | ${pkgs.jq}/bin/jq -r '.ip // empty' 2>/dev/null)
+          org=$(printf '%s' "$resp" | ${pkgs.jq}/bin/jq -r '.org // empty' 2>/dev/null)
+          if [ -z "$ip" ]; then
+            printf '{"text":"? no-ip","class":"unknown","tooltip":"Could not reach ipinfo.io to determine the public IP"}\n'
+            exit 0
+          fi
+          # Match the ASN first: it is stable, whereas the human-readable
+          # name is not. Starlink in particular reports itself as
+          # "AS14593 Space Exploration Technologies Corporation" -- no
+          # "Starlink", no "SpaceX" -- so name matching alone silently
+          # falls through to unknown.
+          case "$org" in
+            AS62371*|*[Pp]roton*)                       owner=P; cls=proton ;;
+            AS14593*|*Space\ Exploration*|*[Ss]tarlink*) owner=S; cls=isp ;;
+            *)                                          owner="?"; cls=unknown ;;
+          esac
+          printf '{"text":"%s %s","class":"%s","tooltip":"%s\r%s"}\n' \
+            "$owner" "$ip" "$cls" "$ip" "''${org:-unknown owner}"
         '';
       in {
       programs.waybar = {
@@ -91,6 +131,7 @@
 
           #custom-power_profile,
           #custom-vpn,
+          #custom-publicip,
           #custom-weather,
           #window,
           #clock,
@@ -162,6 +203,31 @@
               border-radius: 10px 10px 10px 10px;
               margin-right: 10px;
               margin-left: 10px;
+          }
+
+          /* Public IP owner. Independent of the VPN indicator on purpose:
+             green only when the internet says Proton owns the address we
+             are coming from. If this and the padlock ever disagree, this
+             one is measuring rather than inferring. */
+          #custom-publicip.proton {
+              color: #b8bb26; /* green */
+              border-radius: 0px;
+              border-left: 0px;
+              border-right: 0px;
+          }
+
+          #custom-publicip.isp {
+              color: #fb4934; /* red */
+              border-radius: 0px;
+              border-left: 0px;
+              border-right: 0px;
+          }
+
+          #custom-publicip.unknown {
+              color: #d79921; /* yellow */
+              border-radius: 0px;
+              border-left: 0px;
+              border-right: 0px;
           }
 
           #custom-vpn.connected {
@@ -246,6 +312,7 @@
             [ "custom/nix" "clock" "hyprland/workspaces" "custom/weather" ];
           modules-right = [
             "custom/vpn"
+            "custom/publicip"
             "network"
             "bluetooth"
             "temperature"
@@ -282,17 +349,18 @@
             exec = "${vpnStatus}";
             return-type = "json";
             interval = 5;
-            # Launch only if it is not already running. Re-running the
-            # binary does NOT raise the existing window -- it forks a second
-            # instance -- so an unconditional launch here quietly accumulates
-            # duplicate clients every time the module is clicked.
-            #
-            # There is no click-to-raise available: the app's tray item
-            # implements no Activate method (left-click is a no-op) and
-            # org.gtk.Application.Activate on the live instance does nothing
-            # either. To bring the window back once it is minimised to tray,
-            # RIGHT-click the tray icon and use its menu.
-            on-click = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.protonvpn-gui}/bin/protonvpn-app";
+            on-click = "${vpnToggle}";
+            # Right-click opens the Proton app, for picking a server other
+            # than the one this tunnel is pinned to.
+            on-click-right = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.protonvpn-gui}/bin/protonvpn-app";
+          };
+
+          "custom/publicip" = {
+            exec = "${publicIp}";
+            return-type = "json";
+            interval = 300;
+            signal = 9;
+            on-click = "${publicIp}";
           };
 
           "custom/weather" = {
@@ -321,10 +389,9 @@
           memory = { format = "{}% "; };
           network = {
             interval = 1;
-            format-alt = "{ifname}: {ipaddr}/{cidr}";
+            format-alt = "{ifname}";
             format-disconnected = "Disconnected ⚠";
-            format-ethernet =
-              "{ifname}: {ipaddr}/{cidr}   up: {bandwidthUpBits} down: {bandwidthDownBits}";
+            format-ethernet = "{ifname} ↑{bandwidthUpBits} ↓{bandwidthDownBits}";
             format-linked = "{ifname} (No IP) ";
             format-wifi = "{essid} ({signalStrength}%) ";
           };
