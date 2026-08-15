@@ -243,7 +243,12 @@ in
     # array style shown in the upstream nixpkgs example was dropped in v5 and
     # is rejected at runtime with "Found array-style list of instances".
     configuration = {
-      sonarr.main = {
+      # Instance names must be unique across ALL services, not just within
+      # one. Naming both of these "main" made recyclarr log
+      # 'Duplicate instances: ["main"]' and then die with an out-of-bounds
+      # array error -- which the unit reported as a clean success while
+      # creating nothing at all.
+      sonarr.tv = {
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
         quality_definition.type = "series";
@@ -261,7 +266,7 @@ in
           }
         ];
       };
-      radarr.main = {
+      radarr.movies = {
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
         quality_definition.type = "movie";
