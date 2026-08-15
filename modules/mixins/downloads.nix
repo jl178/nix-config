@@ -38,10 +38,11 @@ in
     isSystemUser = true;
     extraGroups = [ "mediagroup" ];
   };
-  users.users.jackett = {
-    isSystemUser = true;
-    extraGroups = [ "mediagroup" ];
-  };
+  # No users.users.jackett here any more. It only added the service account to
+  # mediagroup; the account itself, and crucially its primary group, came from
+  # services.jackett. With that disabled the module stops defining the group
+  # and this bare declaration trips the "users.users.jackett.group is unset"
+  # assertion, which fails evaluation for the whole host.
   users.users.readarr = {
     isSystemUser = true;
     extraGroups = [ "mediagroup" ];
