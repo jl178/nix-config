@@ -158,9 +158,13 @@ in
   services.recyclarr = {
     enable = true;
     schedule = "daily";
+    # Named-style instances: the attribute name IS the instance name. Recyclarr
+    # v5 dropped the array-style list the upstream nixpkgs example still shows
+    # ("Found array-style list of instances instead of named-style"), so an
+    # array here parses but is then rejected at runtime and the whole config
+    # is skipped.
     configuration = {
-      sonarr = [{
-        instance_name = "main";
+      sonarr.main = {
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
         include = [
@@ -168,9 +172,8 @@ in
           { template = "sonarr-v4-quality-profile-web-1080p"; }
           { template = "sonarr-v4-custom-formats-web-1080p"; }
         ];
-      }];
-      radarr = [{
-        instance_name = "main";
+      };
+      radarr.main = {
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
         include = [
@@ -178,7 +181,7 @@ in
           { template = "radarr-quality-profile-hd-bluray-web"; }
           { template = "radarr-custom-formats-hd-bluray-web"; }
         ];
-      }];
+      };
     };
   };
   services.readarr = {
