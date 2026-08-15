@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 
@@ -111,6 +112,53 @@ in
     openFirewall = true;
   };
 
+  # Proton VPN port forwarding for Deluge, over NAT-PMP.
+  #
+  # Without a forwarded port a torrent client can only reach peers that are
+  # themselves connectable: nobody can initiate to you, so you see a fraction
+  # of each swarm and seed poorly. Nord dropped port forwarding entirely,
+  # which is part of why throughput here has been bad. Proton still offers it
+  # on P2P servers, and the WireGuard config for this host was generated with
+  # NAT-PMP enabled.
+  #
+  # Proton's leases last 60 seconds, so this is a renewal loop rather than a
+  # one-shot: it re-requests every 45s and only reconfigures Deluge when the
+  # assigned port actually changes (it is random, and changes on reconnect).
+  # Runs as the deluge user so deluge-console can authenticate as localclient.
+  systemd.services.proton-portforward = {
+    description = "Proton VPN NAT-PMP port forward for Deluge";
+    after = [ "wg-quick-proton0.service" "deluged.service" ];
+    wants = [ "wg-quick-proton0.service" ];
+    requires = [ "deluged.service" ];
+    wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [ libnatpmp deluge coreutils gnugrep ];
+    serviceConfig = {
+      Type = "simple";
+      User = "deluge";
+      Group = "deluge";
+      Restart = "always";
+      RestartSec = 15;
+    };
+    script = ''
+      # NAT-PMP gateway is the tunnel's own gateway, not the LAN router.
+      GW=10.2.0.1
+      last=""
+      while true; do
+        # Both protocols must be mapped, and both renew the same lease window.
+        natpmpc -a 1 0 udp 60 -g "$GW" >/dev/null 2>&1 || true
+        out=$(natpmpc -a 1 0 tcp 60 -g "$GW" 2>/dev/null || true)
+        port=$(printf '%s' "$out" | grep -oE 'public port [0-9]+' | grep -oE '[0-9]+' | head -1)
+        if [ -n "$port" ] && [ "$port" != "$last" ]; then
+          echo "NAT-PMP assigned public port $port; reconfiguring deluge"
+          deluge-console "config --set random_port False"            >/dev/null 2>&1 || true
+          deluge-console "config --set listen_ports ($port,$port)"   >/dev/null 2>&1 || true
+          last=$port
+        fi
+        sleep 45
+      done
+    '';
+  };
+
   # Bazarr, subtitles. Watches the Sonarr/Radarr libraries and fetches subs to
   # match. Web UI :6767.
   services.bazarr = {
@@ -158,6 +206,16 @@ in
   services.recyclarr = {
     enable = true;
     schedule = "daily";
+    # Track unstable for this one package. Stable carries 7.4.1, which looks
+    # for its template index at repositories/config-templates/includes.json;
+    # the upstream config-templates repo now ships templates.json instead, so
+    # 7.4.1 clones the repo successfully and then dies with "Recyclarr
+    # templates.json does not exist". 8.7.0 reads the current layout. Drop
+    # this override once stable catches up.
+    package = (import inputs.nixpkgs-latest {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    }).recyclarr;
     # Named-style instances: the attribute name IS the instance name. Recyclarr
     # v5 dropped the array-style list the upstream nixpkgs example still shows
     # ("Found array-style list of instances instead of named-style"), so an
