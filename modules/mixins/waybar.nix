@@ -394,7 +394,15 @@
             interval = 1;
             format-alt = "{ifname}";
             format-disconnected = "Disconnected ⚠";
-            format-ethernet = "{ifname} ↑{bandwidthUpBits} ↓{bandwidthDownBits}";
+            # No {ifname}: on a wired link it is always eno0 and never changes,
+            # which invites the question "why does it say eno0 when the VPN is
+            # up?". It is not wrong - proton0 is a virtual interface layered on
+            # top of eno0, and the NIC really is carrying the (encrypted)
+            # bytes; measured at 5403 KB on eno0 versus 5248 KB inside the
+            # tunnel for the same 5 MB transfer. It just tells you nothing.
+            # Tunnel state is custom/vpn's job and the exit address is
+            # custom/publicip's. This module is here for throughput.
+            format-ethernet = "↑{bandwidthUpBits} ↓{bandwidthDownBits}";
             format-linked = "{ifname} (No IP) ";
             format-wifi = "{essid} ({signalStrength}%) ";
           };
