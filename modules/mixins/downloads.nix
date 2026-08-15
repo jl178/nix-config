@@ -299,7 +299,17 @@ in
       sonarr.tv = {
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
-        quality_definition.type = "series";
+        # quality_definition is deliberately NOT synced from the guide.
+        # TRaSH's series definitions set minimum sizes from live-action
+        # assumptions - Bluray-1080p at 50.8 MB/min - and that rejects
+        # perfectly good encodes. "Big Top Scooby-Doo!" is 81 minutes, so the
+        # floor came out at 4.0GB and a legitimate 2.3GB release was refused
+        # with "2.3 GB is smaller than minimum allowed 4.0 GB". Animation
+        # compresses far better than live action, and on a satellite uplink
+        # smaller files are the point rather than a compromise. Every tier is
+        # capped at 12.5 MB/min in the app instead, which still rejects
+        # obvious fakes while allowing good compact encodes. Re-enabling this
+        # line would silently restore the 50.8 floor overnight.
         # Score overrides where the guide's defaults conflict with how this
         # house actually watches things. Recyclarr rewrites these profiles
         # daily, so setting them in Sonarr's UI would be undone overnight;
@@ -360,7 +370,17 @@ in
       radarr.movies = {
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
-        quality_definition.type = "movie";
+        # quality_definition is deliberately NOT synced from the guide.
+        # TRaSH's movie definitions set minimum sizes from live-action
+        # assumptions - Bluray-1080p at 50.8 MB/min - and that rejects
+        # perfectly good encodes. "Big Top Scooby-Doo!" is 81 minutes, so the
+        # floor came out at 4.0GB and a legitimate 2.3GB release was refused
+        # with "2.3 GB is smaller than minimum allowed 4.0 GB". Animation
+        # compresses far better than live action, and on a satellite uplink
+        # smaller files are the point rather than a compromise. Every tier is
+        # capped at 12.5 MB/min in the app instead, which still rejects
+        # obvious fakes while allowing good compact encodes. Re-enabling this
+        # line would silently restore the 50.8 floor overnight.
         # Same x265 reasoning as Sonarr above: neutral rather than banned.
         custom_formats = [{
           trash_ids = [ "dc98083864ea246d05a42df0d05f81cc" ];
