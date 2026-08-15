@@ -281,6 +281,38 @@ in
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
         quality_definition.type = "series";
+        # Score overrides where the guide's defaults conflict with how this
+        # house actually watches things. Recyclarr rewrites these profiles
+        # daily, so setting them in Sonarr's UI would be undone overnight;
+        # they have to live here.
+        custom_formats = [
+          {
+            # x265 (HD). The guide scores this -10000 on the reasoning that a
+            # 1080p x265 release is usually a re-encode of already-compressed
+            # source. That is true, and irrelevant here: it rejected things
+            # like "Big Top Scooby Doo 2012 1080p BluRay x265" outright, and
+            # x265 is roughly half the size for much the same watchability,
+            # which matters a lot on a satellite link. Neutral, not preferred.
+            trash_ids = [ "47435ece6b99a0b477caf360e79ba0bb" ];
+            assign_scores_to = [
+              { name = "WEB-1080p"; score = 0; }
+              { name = "[Anime] Remux-1080p"; score = 0; }
+            ];
+          }
+          {
+            # Dubs Only. The guide scores this -10000 because most anime
+            # watchers want subs. This house wants dubs, so a dub-only
+            # release is desirable rather than disqualifying.
+            trash_ids = [ "9c14d194486c4014d422adc64092d794" ];
+            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 200; }];
+          }
+          {
+            # Anime Dual Audio. Best of both - English dub plus the original
+            # track and subtitles - so score it above dub-only.
+            trash_ids = [ "418f50b10f1907201b6cfdf881f467b7" ];
+            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 500; }];
+          }
+        ];
         quality_profiles = [
           # WEB-1080p
           {
@@ -310,6 +342,14 @@ in
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
         quality_definition.type = "movie";
+        # Same x265 reasoning as Sonarr above: neutral rather than banned.
+        custom_formats = [{
+          trash_ids = [ "dc98083864ea246d05a42df0d05f81cc" ];
+          assign_scores_to = [
+            { name = "HD Bluray + WEB"; score = 0; }
+            { name = "Remux + WEB 2160p"; score = 0; }
+          ];
+        }];
         quality_profiles = [
           # HD Bluray + WEB. The default for essentially everything: 1080p,
           # sensible file sizes, and it grabs quickly on a satellite link.
