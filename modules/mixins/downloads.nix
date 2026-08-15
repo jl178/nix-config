@@ -197,6 +197,35 @@ in
     port = 5055;
   };
 
+  # Jellyseerr, the maintained successor to Overseerr. Runs alongside it on
+  # :5056 rather than replacing it, so the existing request history stays
+  # reachable while you migrate.
+  #
+  # Overseerr is not merely stale, it is finished: the repository was
+  # archived read-only on 15 Feb 2026 at v1.34.0. Plex then changed their
+  # watchlist API and Overseerr logs
+  #   Plex.TV Metadata API - Failed to retrieve watchlist items
+  #   {"errorMessage":"Request failed with status code 404"}
+  # on every sync, which is sct/overseerr#4224, #4228, #4230 and #4260, none
+  # of which can now be fixed upstream.
+  #
+  # Jellyseerr is the same application with Plex support intact -- the
+  # Jellyfin support its description mentions is additive. Pinned to unstable
+  # for 3.4.1: stable carries 2.7.3, and while that release does contain
+  # "update Plex Watchlist URL", there is a later regression
+  # (seerr-team/seerr#2369) whose fix landed after it. 3.4.1 is the newest
+  # release and the best chance of a working watchlist; if it still fails,
+  # the fix is on develop and this is not solvable from nixpkgs yet.
+  services.jellyseerr = {
+    enable = true;
+    openFirewall = true;
+    port = 5056;
+    package = (import inputs.nixpkgs-latest {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    }).jellyseerr;
+  };
+
   # Recyclarr: syncs TRaSH Guides quality profiles, custom formats and their
   # scores into Sonarr and Radarr on a schedule. This is the piece that stops
   # junk grabs -- releases from known-bad groups and mislabelled encodes get
