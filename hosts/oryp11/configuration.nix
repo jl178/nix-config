@@ -205,8 +205,20 @@
   };
   users.users.jered = {
     isNormalUser = true;
-    extraGroups =
-      [ "wheel" "docker" "nixosgroup" ]; # Enable ‘sudo’ for the user.
+    # networkmanager is required by the Proton VPN client, not just for
+    # convenience. The app creates its kill-switch as a NetworkManager system
+    # connection, and polkit only grants
+    # org.freedesktop.NetworkManager.settings.modify.system to members of this
+    # group. Without it connecting fails with
+    #   RuntimeError: Error adding KS connection:
+    #   nm-settings-error-quark: Insufficient privileges (1)
+    # which reads like an app bug but is purely group membership.
+    extraGroups = [
+      "wheel"
+      "docker"
+      "nixosgroup"
+      "networkmanager"
+    ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       (wineWowPackages.full.override {
         wineRelease = "staging";

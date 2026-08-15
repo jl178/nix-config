@@ -173,9 +173,14 @@
               border-right: 0px;
           }
 
+          /* Square on the left so it butts cleanly against custom/vpn.
+             This used to be the first module in modules-right, which is why
+             it carried the rounded left edge; custom/vpn now owns that
+             position, and leaving both rounded left put a notch between
+             them. */
           #network {
               color: #d79921; /* yellow */
-              border-radius: 10px 0px 0px 10px;
+              border-radius: 0px;
               border-left: 0px;
               border-right: 0px;
           }
