@@ -282,7 +282,17 @@
             exec = "${vpnStatus}";
             return-type = "json";
             interval = 5;
-            on-click = "${pkgs.protonvpn-gui}/bin/protonvpn-app";
+            # Launch only if it is not already running. Re-running the
+            # binary does NOT raise the existing window -- it forks a second
+            # instance -- so an unconditional launch here quietly accumulates
+            # duplicate clients every time the module is clicked.
+            #
+            # There is no click-to-raise available: the app's tray item
+            # implements no Activate method (left-click is a no-op) and
+            # org.gtk.Application.Activate on the live instance does nothing
+            # either. To bring the window back once it is minimised to tray,
+            # RIGHT-click the tray icon and use its menu.
+            on-click = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.protonvpn-gui}/bin/protonvpn-app";
           };
 
           "custom/weather" = {
