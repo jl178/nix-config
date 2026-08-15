@@ -17,10 +17,10 @@
             | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
           case "$dev" in
             proton*|pvpn*|wg*)
-              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up - traffic exits via %s. Click to disconnect."}\n' "$dev"
+              printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up - traffic exits via %s. Click to disconnect."}\n' "$dev"
               ;;
             *)
-              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN DOWN - traffic exits via %s. Click to connect."}\n' "''${dev:-unknown}"
+              printf '{"text":" VPN","class":"disconnected","tooltip":"Proton VPN DOWN - traffic exits via %s. Click to connect."}\n' "''${dev:-unknown}"
               ;;
           esac
         '';
@@ -56,21 +56,24 @@
           ip=$(printf '%s' "$resp" | ${pkgs.jq}/bin/jq -r '.ip // empty' 2>/dev/null)
           org=$(printf '%s' "$resp" | ${pkgs.jq}/bin/jq -r '.org // empty' 2>/dev/null)
           if [ -z "$ip" ]; then
-            printf '{"text":"? no-ip","class":"unknown","tooltip":"Could not reach ipinfo.io to determine the public IP"}\n'
+            printf '{"text":" no-ip","class":"unknown","tooltip":"Could not reach ipinfo.io to determine the public IP"}\n'
             exit 0
           fi
-          # Match the ASN first: it is stable, whereas the human-readable
-          # name is not. Starlink in particular reports itself as
-          # "AS14593 Space Exploration Technologies Corporation" -- no
-          # "Starlink", no "SpaceX" -- so name matching alone silently
-          # falls through to unknown.
+          # Owner drives the COLOUR only -- green for Proton, red for the
+          # bare ISP -- rather than a letter in the text, which just looked
+          # like a stray character. The org name goes in the tooltip.
+          #
+          # Match the ASN first: it is stable, the human-readable name is
+          # not. Starlink reports itself as "AS14593 Space Exploration
+          # Technologies Corporation", containing neither "Starlink" nor
+          # "SpaceX", so name matching alone falls through to unknown.
           case "$org" in
-            AS62371*|*[Pp]roton*)                       owner=P; cls=proton ;;
-            AS14593*|*Space\ Exploration*|*[Ss]tarlink*) owner=S; cls=isp ;;
-            *)                                          owner="?"; cls=unknown ;;
+            AS62371*|*[Pp]roton*)                       cls=proton ;;
+            AS14593*|*Space\ Exploration*|*[Ss]tarlink*) cls=isp ;;
+            *)                                          cls=unknown ;;
           esac
           printf '{"text":"%s %s","class":"%s","tooltip":"%s\r%s"}\n' \
-            "$owner" "$ip" "$cls" "$ip" "''${org:-unknown owner}"
+            "" "$ip" "$cls" "$ip" "''${org:-unknown owner}"
         '';
       in {
       programs.waybar = {
