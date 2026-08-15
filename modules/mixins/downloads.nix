@@ -112,6 +112,17 @@ in
     openFirewall = true;
   };
 
+  # The nixpkgs recyclarr module is written against 7.x and builds its
+  # ExecStart as `recyclarr sync --app-data <dir> --config <file>`. 8.x
+  # removed --app-data ("Unknown option 'app-data'") in favour of the
+  # RECYCLARR_CONFIG_DIR environment variable, so the unit has to be
+  # rewritten to match the package we pinned above. --config is unchanged.
+  systemd.services.recyclarr = {
+    environment.RECYCLARR_CONFIG_DIR = "/var/lib/recyclarr";
+    serviceConfig.ExecStart = lib.mkForce
+      "${lib.getExe config.services.recyclarr.package} sync --config /var/lib/recyclarr/config.json";
+  };
+
   # Proton VPN port forwarding for Deluge, over NAT-PMP.
   #
   # Without a forwarded port a torrent client can only reach peers that are
@@ -225,22 +236,30 @@ in
     # array here parses but is then rejected at runtime and the whole config
     # is skipped.
     configuration = {
+      # Template names are those of the v8 config-templates repo, which
+      # renamed everything: the v7-era sonarr-v4-quality-profile-web-1080p /
+      # radarr-quality-definition-movie names no longer resolve and fail the
+      # run with "Unable to find include template with name ...". Check
+      # /var/lib/recyclarr/repositories/config-templates/templates.json for
+      # the current set before changing these.
       sonarr.main = {
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
         include = [
-          { template = "sonarr-quality-definition-series"; }
-          { template = "sonarr-v4-quality-profile-web-1080p"; }
-          { template = "sonarr-v4-custom-formats-web-1080p"; }
+          { template = "sonarr-remux-web-1080p"; }
+          # Anime gets its own profile and custom formats. Anime releases are
+          # scored quite differently from live action -- subgroup preference
+          # matters far more than source -- so without this the anime library
+          # is judged by rules meant for something else.
+          { template = "sonarr-anime-remux-1080p"; }
         ];
       };
       radarr.main = {
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
         include = [
-          { template = "radarr-quality-definition-movie"; }
-          { template = "radarr-quality-profile-hd-bluray-web"; }
-          { template = "radarr-custom-formats-hd-bluray-web"; }
+          { template = "radarr-remux-web-1080p"; }
+          { template = "radarr-anime-remux-1080p"; }
         ];
       };
     };
