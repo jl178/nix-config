@@ -286,12 +286,23 @@ in
           {
             trash_id = "72dae194fc92bf828f32cde7744e51a1";
             reset_unmatched_scores.enabled = true;
+            min_format_score = 0;
           }
           # [Anime] Remux-1080p. Anime is scored on subgroup rather than
           # source, so the live-action profile is close to useless for it.
+          #
+          # min_format_score 0 is deliberate and important. The guide ships
+          # this profile with a minimum of 100, meaning a release must match
+          # preferred custom formats worth 100+ points or Sonarr refuses it
+          # outright. In practice that rejected everything: a search returning
+          # 264 releases approved zero, with "Custom Formats have score 0
+          # below Series profile minimum 100" among the reasons. Junk is still
+          # rejected, because that works through NEGATIVE scores (LQ, BR-DISK,
+          # Anime LQ Groups at -10000), which are unaffected by this floor.
           {
             trash_id = "20e0fc959f1f1704bed501f23bdae76f";
             reset_unmatched_scores.enabled = true;
+            min_format_score = 0;
           }
         ];
       };
@@ -305,6 +316,7 @@ in
           {
             trash_id = "d1d67249d3890e49bc12e275d989a7e9";
             reset_unmatched_scores.enabled = true;
+            min_format_score = 0;
           }
           # Remux + WEB 2160p, deliberately NOT the default. Reserved for the
           # handful of films worth the disk and the download time (Harry
@@ -315,6 +327,7 @@ in
           {
             trash_id = "fd161a61e3ab826d3a22d53f935696dd";
             reset_unmatched_scores.enabled = true;
+            min_format_score = 0;
           }
         ];
       };
