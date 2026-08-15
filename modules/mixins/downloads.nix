@@ -197,88 +197,85 @@ in
     port = 5055;
   };
 
-  # Recyclarr, quality automation. This is the piece that addresses junk
-  # grabs: it syncs TRaSH Guides custom formats and quality profiles into
-  # Sonarr and Radarr on a schedule, scoring releases so known-bad groups,
-  # mislabelled encodes and executable payloads are rejected before they are
-  # ever sent to the download client.
+  # Recyclarr: syncs TRaSH Guides quality profiles, custom formats and their
+  # scores into Sonarr and Radarr on a schedule. This is the piece that stops
+  # junk grabs -- releases from known-bad groups and mislabelled encodes get
+  # negative scores and are never sent to the download client in the first
+  # place, rather than being downloaded and then refused at import.
   #
-  # API keys are NOT in this repo -- it is public. _secret points at the real
+  # CONFIG FORMAT, v8. Do not reintroduce `include: [{ template = ...; }]`.
+  # Upstream states plainly: "The official config-templates repository no
+  # longer provides include templates as of v8." That directive now only
+  # works with a custom resource provider shipping its own includes.json, so
+  # every template id fails to resolve regardless of naming -- which is what
+  # broke this before, not the ids themselves. v8 replaces the whole
+  # mechanism with a single trash_id per quality profile, pulled straight
+  # from the guides.
+  #   https://recyclarr.dev/reference/configuration/include/
+  #
+  # trash_ids below were read out of the cloned guides on this host, at
+  # /var/lib/recyclarr/resources/trash-guides/git/official, not copied from
+  # a blog post. Verify there if they ever stop matching.
+  #
+  # API keys are NOT in this repo -- it is public. _secret names the real
   # file on disk and the module's genJqSecretsReplacement generates the
-  # matching systemd LoadCredential itself, then substitutes the value into
-  # config.json at pre-start. Do not also declare LoadCredential by hand, and
-  # do not point _secret at /run/credentials/...: the generator would take
-  # that as the *source* path, making it its own source, which fails at unit
-  # start with "Failed to set up credentials: Protocol error"
-  # (243/CREDENTIALS). The example in the upstream module is misleading here.
-  # Populate the key files with:
+  # matching systemd LoadCredential itself. Do not also declare
+  # LoadCredential by hand, and do not point _secret at /run/credentials/...:
+  # the generator treats the value as the *source* path, so that makes the
+  # credential its own source and the unit dies at 243/CREDENTIALS.
+  # Recreate the key files with:
   #   sudo install -d -m 0700 /etc/recyclarr
   #   sudo grep -oP '(?<=<ApiKey>)[^<]+' /var/lib/sonarr/config.xml \
   #     | sudo tee /etc/recyclarr/sonarr-api_key >/dev/null
   #   sudo grep -oP '(?<=<ApiKey>)[^<]+' /var/lib/radarr/config.xml \
   #     | sudo tee /etc/recyclarr/radarr-api_key >/dev/null
   #   sudo chmod 0400 /etc/recyclarr/*-api_key
-  # Recyclarr is DISABLED, not removed. Its include-templates do not resolve
-  # with this package/repo combination: 8.6.0 initialises both providers,
-  # clones config-templates completely (61 template yml files present, ids
-  # listed in templates.json), and then fails every lookup with "Unable to
-  # find include template with name ..." -- for prefixed and unprefixed ids
-  # alike, and for templates whose yml demonstrably exists on disk. Stable
-  # 7.4.1 is no better: it wants an includes.json the current repo no longer
-  # ships. Leaving it enabled just means a failing unit every day.
-  #
-  # What it was for -- rejecting junk releases before they reach the download
-  # client -- is partly covered in the meantime by the Sonarr release profile
-  # created via the API ("Anime - prefer English dub"), but that is much
-  # narrower than the TRaSH custom formats. Worth revisiting when nixpkgs
-  # carries a recyclarr whose module and package agree.
   services.recyclarr = {
-    enable = false;
+    enable = true;
     schedule = "daily";
-    # Track unstable for this one package. Stable carries 7.4.1, which looks
-    # for its template index at repositories/config-templates/includes.json;
-    # the upstream config-templates repo now ships templates.json instead, so
-    # 7.4.1 clones the repo successfully and then dies with "Recyclarr
-    # templates.json does not exist". 8.7.0 reads the current layout. Drop
-    # this override once stable catches up.
+    # Stable is 7.4.1, which expects an includes.json the guides repo no
+    # longer ships and dies on startup. 8.x reads the current layout.
     package = (import inputs.nixpkgs-latest {
       inherit (pkgs.stdenv.hostPlatform) system;
       config.allowUnfree = true;
     }).recyclarr;
-    # Named-style instances: the attribute name IS the instance name. Recyclarr
-    # v5 dropped the array-style list the upstream nixpkgs example still shows
-    # ("Found array-style list of instances instead of named-style"), so an
-    # array here parses but is then rejected at runtime and the whole config
-    # is skipped.
+    # Named-style instances: the attribute name IS the instance name. The
+    # array style shown in the upstream nixpkgs example was dropped in v5 and
+    # is rejected at runtime with "Found array-style list of instances".
     configuration = {
-      # Template names are those of the v8 config-templates repo, which
-      # renamed everything: the v7-era sonarr-v4-quality-profile-web-1080p /
-      # radarr-quality-definition-movie names no longer resolve and fail the
-      # run with "Unable to find include template with name ...". Check
-      # /var/lib/recyclarr/repositories/config-templates/templates.json for
-      # the current set before changing these.
       sonarr.main = {
         base_url = "http://localhost:8989";
         api_key._secret = "/etc/recyclarr/sonarr-api_key";
-        include = [
-          { template = "sonarr-remux-web-1080p"; }
-          # Anime gets its own profile and custom formats. Anime releases are
-          # scored quite differently from live action -- subgroup preference
-          # matters far more than source -- so without this the anime library
-          # is judged by rules meant for something else.
-          { template = "sonarr-anime-remux-1080p"; }
+        quality_definition.type = "series";
+        quality_profiles = [
+          # WEB-1080p
+          {
+            trash_id = "72dae194fc92bf828f32cde7744e51a1";
+            reset_unmatched_scores.enabled = true;
+          }
+          # [Anime] Remux-1080p. Anime is scored on subgroup rather than
+          # source, so the live-action profile is close to useless for it.
+          {
+            trash_id = "20e0fc959f1f1704bed501f23bdae76f";
+            reset_unmatched_scores.enabled = true;
+          }
         ];
       };
       radarr.main = {
         base_url = "http://localhost:7878";
         api_key._secret = "/etc/recyclarr/radarr-api_key";
-        include = [
-          { template = "radarr-remux-web-1080p"; }
-          { template = "radarr-anime-remux-1080p"; }
+        quality_definition.type = "movie";
+        quality_profiles = [
+          # HD Bluray + WEB
+          {
+            trash_id = "d1d67249d3890e49bc12e275d989a7e9";
+            reset_unmatched_scores.enabled = true;
+          }
         ];
       };
     };
   };
+
   services.readarr = {
     enable = true;
     openFirewall = true;
