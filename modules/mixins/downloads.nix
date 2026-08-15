@@ -271,9 +271,20 @@ in
         api_key._secret = "/etc/recyclarr/radarr-api_key";
         quality_definition.type = "movie";
         quality_profiles = [
-          # HD Bluray + WEB
+          # HD Bluray + WEB. The default for essentially everything: 1080p,
+          # sensible file sizes, and it grabs quickly on a satellite link.
           {
             trash_id = "d1d67249d3890e49bc12e275d989a7e9";
+            reset_unmatched_scores.enabled = true;
+          }
+          # Remux + WEB 2160p, deliberately NOT the default. Reserved for the
+          # handful of films worth the disk and the download time (Harry
+          # Potter, Lord of the Rings and similar). It also has to exist
+          # because those titles already have 2160p files on disk: if their
+          # profile did not permit 2160p, Radarr would treat what is already
+          # there as an unwanted quality.
+          {
+            trash_id = "fd161a61e3ab826d3a22d53f935696dd";
             reset_unmatched_scores.enabled = true;
           }
         ];
