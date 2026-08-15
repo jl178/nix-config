@@ -286,6 +286,19 @@
               border-right: 0px;
           }
 
+          /* Fixed minimum widths so the bar stops expanding and contracting.
+             Right-aligning the text was not enough on its own: these values
+             change length constantly -- "1.2 kb/s" vs "10.6 Mb/s", a two- vs
+             three-digit ms, a short vs long IP -- and every change shoved
+             every module to their right. A min-width pins the box so only
+             the text inside it moves. */
+          #network { min-width: 190px; }
+          #custom-latency { min-width: 78px; }
+          #custom-publicip { min-width: 148px; }
+          #temperature { min-width: 76px; }
+          #cpu { min-width: 62px; }
+          #memory { min-width: 62px; }
+
           #custom-latency.good { color: #b8bb26; border-radius: 0px; }
           #custom-latency.warn { color: #d79921; border-radius: 0px; }
           #custom-latency.bad  { color: #fb4934; border-radius: 0px; }
@@ -488,9 +501,16 @@
           };
           "sway/mode" = { format = ''<span style="italic">{}</span>''; };
           temperature = {
+            # 80C, i.e. 176F. critical-threshold is always Celsius no matter
+            # what the format string displays.
             critical-threshold = 80;
-            format = "{temperatureC}°C {icon}";
-            format-icons = [ "" "" "" ];
+            format = "{temperatureF}°F {icon}";
+            # Font Awesome thermometers, five levels. The previous set used
+            # U+F769 and U+F76B, which JetBrainsMono Nerd Font does not
+            # contain, so only the middle icon ever rendered and the module
+            # showed tofu at low and high temperatures. Every codepoint below
+            # was checked against the installed font with fc-list.
+            format-icons = [ "" "" "" "" "" ];
           };
         }];
       };
