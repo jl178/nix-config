@@ -140,9 +140,15 @@ in
   # mislabelled encodes and executable payloads are rejected before they are
   # ever sent to the download client.
   #
-  # API keys are NOT in this repo -- it is public. They are read at runtime
-  # from files via systemd credentials; see LoadCredential below. Populate
-  # them with:
+  # API keys are NOT in this repo -- it is public. _secret points at the real
+  # file on disk and the module's genJqSecretsReplacement generates the
+  # matching systemd LoadCredential itself, then substitutes the value into
+  # config.json at pre-start. Do not also declare LoadCredential by hand, and
+  # do not point _secret at /run/credentials/...: the generator would take
+  # that as the *source* path, making it its own source, which fails at unit
+  # start with "Failed to set up credentials: Protocol error"
+  # (243/CREDENTIALS). The example in the upstream module is misleading here.
+  # Populate the key files with:
   #   sudo install -d -m 0700 /etc/recyclarr
   #   sudo grep -oP '(?<=<ApiKey>)[^<]+' /var/lib/sonarr/config.xml \
   #     | sudo tee /etc/recyclarr/sonarr-api_key >/dev/null
@@ -156,7 +162,7 @@ in
       sonarr = [{
         instance_name = "main";
         base_url = "http://localhost:8989";
-        api_key._secret = "/run/credentials/recyclarr.service/sonarr-api_key";
+        api_key._secret = "/etc/recyclarr/sonarr-api_key";
         include = [
           { template = "sonarr-quality-definition-series"; }
           { template = "sonarr-v4-quality-profile-web-1080p"; }
@@ -166,7 +172,7 @@ in
       radarr = [{
         instance_name = "main";
         base_url = "http://localhost:7878";
-        api_key._secret = "/run/credentials/recyclarr.service/radarr-api_key";
+        api_key._secret = "/etc/recyclarr/radarr-api_key";
         include = [
           { template = "radarr-quality-definition-movie"; }
           { template = "radarr-quality-profile-hd-bluray-web"; }
@@ -175,10 +181,6 @@ in
       }];
     };
   };
-  systemd.services.recyclarr.serviceConfig.LoadCredential = [
-    "sonarr-api_key:/etc/recyclarr/sonarr-api_key"
-    "radarr-api_key:/etc/recyclarr/radarr-api_key"
-  ];
   services.readarr = {
     enable = true;
     openFirewall = true;
