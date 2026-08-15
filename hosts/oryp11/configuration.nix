@@ -10,6 +10,7 @@
     mixins-common
     mixins-nvidia
     mixins-neovim
+    mixins-proton
   ];
   specialisation.i3 = {
     inheritParentConfig = true;
@@ -53,19 +54,27 @@
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
 
-  # VPN is the Proton desktop app (installed below), not a declarative tunnel.
-  # This is a roaming laptop: it needs to pick servers, connect and disconnect
-  # on demand, and survive suspend and network changes, which an always-on
-  # pinned tunnel handles badly. The app manages its own kill-switch and DNS.
-  #
-  # The reverse-path filter must be relaxed or the app's tunnel is dropped by
-  # the firewall; this is the standard NixOS gotcha for Proton's client.
-  # https://discourse.nixos.org/t/how-to-configure-and-use-proton-vpn-on-nixos/65837
-  networking.firewall.checkReversePath = false;
+  # VPN is the Proton desktop app, pulled in by mixins-proton above, not a
+  # declarative tunnel. This is a roaming laptop: it needs to pick servers,
+  # connect and disconnect on demand, and survive suspend and network changes,
+  # which an always-on pinned tunnel handles badly. The app manages its own
+  # kill-switch and DNS. The rp_filter workaround it needs lives in the mixin
+  # beside the package that requires it.
   services.ollama = {
     enable = true;
-    package =
-      inputs.nixpkgs-latest.legacyPackages.${pkgs.stdenv.hostPlatform.system}.ollama-cuda;
+    # Instantiate nixpkgs-latest explicitly rather than reaching into
+    # legacyPackages. legacyPackages is a bare import with the *default*
+    # config, so it does not inherit nixpkgs.config.allowUnfree from the
+    # module system below -- ollama-cuda pulls CUDA, CUDA is unfree, and the
+    # whole host refused to evaluate ("Refusing to evaluate package
+    # 'cuda12.9-cuda_cudart' ... unfree license (CUDA EULA)"). That failure
+    # predates and is independent of anything Proton-related; it simply meant
+    # no rebuild of this host could succeed. Same shape as the flake's own
+    # containerPkgs helper.
+    package = (import inputs.nixpkgs-latest {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    }).ollama-cuda;
     # acceleration = "cuda";
     openFirewall = true;
   };
@@ -221,14 +230,13 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # Proton VPN. The GTK app is the supported Linux client and is what logs
-    # in with the Proton *account* credentials; the OpenVPN/IKEv2
-    # username/password pair in the account portal is only for third-party
-    # clients and is not used here. wireguard-tools is required alongside it
-    # because the app negotiates WireGuard rather than shipping its own
-    # userspace implementation.
-    protonvpn-gui
-    wireguard-tools
+    # Proton apps come from mixins-proton, imported above.
+
+    # File encryption. Used for the account-recovery material in ~/.secrets:
+    # `age -p` derives the key from a passphrase via scrypt rather than a key
+    # file, which matters for recovery documents -- a key file can be lost in
+    # the same incident that made you need them.
+    age
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     killall
     git
