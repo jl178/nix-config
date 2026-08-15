@@ -135,7 +135,10 @@ in
     serviceConfig = {
       Type = "simple";
       User = "deluge";
-      Group = "deluge";
+      # mediagroup, not "deluge": services.deluge.group is set to mediagroup
+      # above and no group named deluge exists, so requesting one fails the
+      # unit at 216/GROUP before the script ever runs.
+      Group = "mediagroup";
       Restart = "always";
       RestartSec = 15;
     };
