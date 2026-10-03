@@ -2,7 +2,7 @@
   description = "NixOS configuration";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
-    # Freshness pin for individual packages (e.g. ollama-cuda on oryp11)
+    # Freshness pin for individual packages (Plex, seerr on the media hosts)
     # that need a newer revision than the stable channel ships.
     nixpkgs-latest.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl = {
@@ -25,16 +25,10 @@
       url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # AeroThemePlasma (Windows 7 look for KDE Plasma 6). Its flake requires
-    # nixos-unstable, so follow the unstable pin rather than stable nixpkgs.
-    aerothemeplasma-nix = {
-      url = "github:nyakase/aerothemeplasma-nix";
-      inputs.nixpkgs.follows = "nixpkgs-latest";
-    };
   };
 
   outputs = { self, nixpkgs, nixpkgs-latest, nixos-wsl, nixvim
-    , home-manager, agenix, darwin, aerothemeplasma-nix, ... }@inputs:
+    , home-manager, agenix, darwin, ... }@inputs:
     let
       # Systems the dev container image can be built for. Note that building an
       # aarch64-linux image from aarch64-darwin needs a Linux builder

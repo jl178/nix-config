@@ -41,15 +41,6 @@
       imports = with inputs.self.nixosModules; [ mixins-nvidia mixins-gnome ];
     };
   };
-  specialisation.aerothemeplasma = {
-    inheritParentConfig = true;
-    configuration = {
-      imports = with inputs.self.nixosModules; [
-        mixins-nvidia
-        mixins-aerothemeplasma
-      ];
-    };
-  };
 
   fonts.packages = builtins.filter lib.attrsets.isDerivation
     (builtins.attrValues pkgs.nerd-fonts);
@@ -120,24 +111,13 @@
       }
     });
   '';
-  services.ollama = {
-    enable = true;
-    # Instantiate nixpkgs-latest explicitly rather than reaching into
-    # legacyPackages. legacyPackages is a bare import with the *default*
-    # config, so it does not inherit nixpkgs.config.allowUnfree from the
-    # module system below -- ollama-cuda pulls CUDA, CUDA is unfree, and the
-    # whole host refused to evaluate ("Refusing to evaluate package
-    # 'cuda12.9-cuda_cudart' ... unfree license (CUDA EULA)"). That failure
-    # predates and is independent of anything Proton-related; it simply meant
-    # no rebuild of this host could succeed. Same shape as the flake's own
-    # containerPkgs helper.
-    package = (import inputs.nixpkgs-latest {
-      inherit (pkgs.stdenv.hostPlatform) system;
-      config.allowUnfree = true;
-    }).ollama-cuda;
-    # acceleration = "cuda";
-    openFirewall = true;
-  };
+  # No services.ollama here any more. It ran ollama-cuda from nixpkgs-latest,
+  # and because CUDA is unfree nothing in the binary cache covers it: every
+  # bump of that pin recompiled the CUDA kernels from source, which held up
+  # the 26.05 rebuild for the better part of an hour. The neovim avante
+  # config still names ollama as its provider; point it at a remote endpoint
+  # or re-add `services.ollama` (plain `ollama` is cached, CPU-only) if that
+  # is wanted again.
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -272,10 +252,11 @@
       "networkmanager"
     ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
-      (wineWowPackages.full.override {
-        wineRelease = "staging";
-        mingwSupport = true;
-      })
+      # WoW64 build (32-bit apps run through the 64-bit binary), staging
+      # release with every optional feature. The old wineWowPackages override
+      # (separate 32-bit build) is deprecated on 26.05 and no longer in the
+      # binary cache, so it compiled Wine from source on every nixpkgs bump.
+      wineWow64Packages.stagingFull
       winetricks
       brave
     ];
