@@ -55,9 +55,9 @@
 
             # Keep it out of the way if it does open a window: float it rather
             # than letting it claim a tile, and do not steal focus at login.
-            windowrulev2 = float,class:^(protonvpn-app|Proton VPN)$
-            windowrulev2 = noinitialfocus,class:^(protonvpn-app|Proton VPN)$
-            windowrulev2 = center,class:^(protonvpn-app|Proton VPN)$
+            windowrule = match:class ^(protonvpn-app|Proton VPN)$, float on
+            windowrule = match:class ^(protonvpn-app|Proton VPN)$, no_initial_focus on
+            windowrule = match:class ^(protonvpn-app|Proton VPN)$, center on
             cursor {
               no_hardware_cursors = true
             }
@@ -126,7 +126,6 @@
 
             dwindle {
                 # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
-                pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
                 preserve_split = yes # you probably want this
             }
 
@@ -134,8 +133,8 @@
                 # See https://wiki.hyprland.org/Configuring/Variables/ for more
             }
 
-            windowrulev2 = opacity 0.8 0.8,class:^(kitty)$
-            windowrulev2 = opacity 0.8 0.8,class:^(thunar)$
+            windowrule = match:class ^(kitty)$, opacity 0.8 0.8
+            windowrule = match:class ^(thunar)$, opacity 0.8 0.8
 
             $mainMod = ALT
 
@@ -149,7 +148,7 @@
             bind = $mainMod, V, togglefloating, # Allow a window to float
             bind = $mainMod, SPACE, exec, wofi # Show the graphicall app launcher
             bind = $mainMod, P, pseudo, # dwindle
-            bind = $mainMod, J, togglesplit, # dwindle
+            bind = $mainMod, J, layoutmsg, togglesplit # dwindle
             bind = $mainMod SHIFT, F, fullscreen, 1
             bind = $mainMod, S, exec, grim -g "$(slurp)" - | swappy -f - # take a screenshot
 

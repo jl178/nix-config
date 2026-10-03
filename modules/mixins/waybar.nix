@@ -18,6 +18,15 @@
         # blackholes. The handshake timestamp is the only thing that catches
         # it. Keepalive is 25s, so anything past ~180s is genuinely wrong
         # rather than merely idle.
+        #
+        # Two details that are easy to get wrong here. sudo must be the
+        # setuid wrapper in /run/wrappers: the store copy (pkgs.sudo) has no
+        # setuid bit and just exits with "must be owned by uid 0", which the
+        # 2>/dev/null below hid, so the handshake age silently never worked.
+        # And tooltip line breaks must be the JSON escape (\\n in the printf
+        # format, which prints backslash-n), never a raw control character:
+        # waybar 0.15 rejects those with "Control character in string" and
+        # the whole module disappears.
         vpnStatus = pkgs.writeShellScript "waybar-vpn-status" ''
           dev=$(${pkgs.iproute2}/bin/ip route get 1.1.1.1 2>/dev/null \
             | ${pkgs.gawk}/bin/awk '{for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit }}')
@@ -28,7 +37,7 @@
               exit 0
               ;;
           esac
-          hs=$(${pkgs.sudo}/bin/sudo -n ${pkgs.wireguard-tools}/bin/wg show proton0 latest-handshakes 2>/dev/null \
+          hs=$(/run/wrappers/bin/sudo -n ${pkgs.wireguard-tools}/bin/wg show proton0 latest-handshakes 2>/dev/null \
             | ${pkgs.gawk}/bin/awk '{print $2; exit}')
           now=$(${pkgs.coreutils}/bin/date +%s)
           if [ -n "$hs" ] && [ "$hs" -gt 0 ] 2>/dev/null; then
@@ -37,11 +46,11 @@
             age=-1
           fi
           if [ "$age" -ge 0 ] && [ "$age" -le 180 ]; then
-            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s\rhandshake %ss ago\rClick to disconnect."}\n' "$dev" "$age"
+            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s\\nhandshake %ss ago\\nClick to disconnect."}\n' "$dev" "$age"
           elif [ "$age" -gt 180 ]; then
-            printf '{"text":" VPN","class":"stale","tooltip":"Tunnel is up but the last handshake was %ss ago - the peer may be gone and traffic may be blackholing.\rClick to reconnect."}\n' "$age"
+            printf '{"text":" VPN","class":"stale","tooltip":"Tunnel is up but the last handshake was %ss ago - the peer may be gone and traffic may be blackholing.\\nClick to reconnect."}\n' "$age"
           else
-            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s (handshake age unavailable)\rClick to disconnect."}\n' "$dev"
+            printf '{"text":" VPN","class":"connected","tooltip":"Proton VPN up via %s (handshake age unavailable)\\nClick to disconnect."}\n' "$dev"
           fi
         '';
 
@@ -110,7 +119,7 @@
             AS14593*|*Space\ Exploration*|*[Ss]tarlink*) cls=isp ;;
             *)                                          cls=unknown ;;
           esac
-          printf '{"text":"%s %s","class":"%s","tooltip":"%s\r%s"}\n' \
+          printf '{"text":"%s %s","class":"%s","tooltip":"%s\\n%s"}\n' \
             "" "$ip" "$cls" "$ip" "''${org:-unknown owner}"
         '';
       in {
