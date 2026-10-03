@@ -154,13 +154,6 @@
     };
   };
 
-  nix = {
-    # From flake-utils-plus
-    generateNixPathFromInputs = true;
-    generateRegistryFromInputs = true;
-    linkInputs = true;
-  };
-
   # networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -188,7 +181,6 @@
   nixpkgs.config.allowUnfree = true;
   programs.zsh.enable = true;
   virtualisation.docker.enable = true;
-  virtualisation.docker.package = pkgs.docker_29;
 
   # Enable the X11 windowing system.
   # services.xserver.enable = true;

@@ -12,7 +12,7 @@
       cmake
       lsd
       python312
-      nodejs_20
+      nodejs_22
       fzf
       ripgrep
       lazygit
@@ -27,14 +27,14 @@
       go
       rustc
       cargo
-      docker_29
+      docker
       docker-compose
       glab
       azure-cli
       awscli2
       google-cloud-sdk
       mariadb
-      (airlift.override { docker = docker_29; })
+      airlift
       devbox
       lombok
       tree

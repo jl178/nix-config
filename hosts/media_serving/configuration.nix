@@ -10,9 +10,9 @@
 
   services.openssh = { enable = true; };
 
-  fonts.packages = [ pkgs.font-awesome ]
-    ++ builtins.filter lib.attrsets.isDerivation
-    (builtins.attrValues pkgs.nerd-fonts);
+  # Just font-awesome. This used to pull in every package in pkgs.nerd-fonts,
+  # which is several GB of closure on a host with no display server.
+  fonts.packages = [ pkgs.font-awesome ];
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
@@ -68,13 +68,6 @@
       inherit inputs;
       headless = false;
     };
-  };
-
-  nix = {
-    # From flake-utils-plus
-    generateNixPathFromInputs = true;
-    generateRegistryFromInputs = true;
-    linkInputs = true;
   };
 
   # Configure keymap in X11

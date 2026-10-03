@@ -48,6 +48,22 @@ To apply a configuration to a system, use the appropriate command based on your 
 
 Replace `<hostname>` with the target system name, such as `iseries`, `oryp11`, `wsl`, or `jlittle-mbp`.
 
+  Or with [`nh`](https://github.com/nix-community/nh) (enabled on every NixOS
+  host via `mixins-common`), which shows a build graph and a package diff
+  before activating. The flake path is preconfigured; the hostnames do not
+  match the flake output names, so pass `-H`:
+  ```bash
+  nh os switch -H oryp11
+  ```
+
+- **Remote hosts**: build on the workstation and push the result, rather than
+  compiling on the target. `proxmox-media` has under 6G of RAM and has been
+  OOM-killed mid-rebuild when building locally.
+  ```bash
+  nixos-rebuild switch --flake .#proxmox-media \
+    --target-host jered@192.168.1.65 --build-host localhost --sudo --ask-sudo-password
+  ```
+
 ### Customization
 
 The `hosts/` directory is the starting point for customizing configurations for different machines. The `modules/` directory allows for shared customization of system behavior, including desktop environment tweaks, font management, and Neovim plugins.

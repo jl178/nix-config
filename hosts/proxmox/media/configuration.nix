@@ -19,12 +19,8 @@
 
   services.openssh = { enable = true; };
   virtualisation.docker.enable = true;
-  # nixpkgs still aliases `docker` to docker_28, which is now marked insecure
-  # (unmaintained since November 2025) and refuses to evaluate, so *any*
-  # rebuild of this host failed regardless of what was being changed. Pin the
-  # successor explicitly: 29.4.1 is already the running daemon, so this makes
-  # the config agree with reality rather than allowing an insecure package.
-  virtualisation.docker.package = pkgs.docker_29;
+  # No docker package pin: on 25.11 `docker` still aliased the insecure
+  # docker_28 and had to be pinned to docker_29. On 26.05 the alias is 29.x.
 
   services.rpcbind.enable = true;
   services.nfs.server = {
@@ -37,15 +33,26 @@
   networking.firewall.allowedTCPPorts = [ 111 2049 20048 32765 32768 ];
   networking.firewall.allowedUDPPorts = [ 111 2049 20048 32765 32768 ];
 
-  fonts.packages = [ pkgs.font-awesome ]
-    ++ builtins.filter lib.attrsets.isDerivation
-    (builtins.attrValues pkgs.nerd-fonts);
-  # fileSystems."/mnt/zfs" = {
-  #   device =
-  #     "5cd8b6f4-bfef-4840-b1f1-47ea7bab3ab9"; # Or the correct device for your setup
-  #   fsType = "ext4"; # Or whatever filesystem you're using
-  #   options = [ "x-systemd.automount" "nofail" ];
-  # }; # Bootloader.
+  # Just font-awesome. This used to pull in every package in pkgs.nerd-fonts,
+  # which is several GB of closure on a host with no display server.
+  fonts.packages = [ pkgs.font-awesome ];
+  # The 34T media disk. Despite the path there is no ZFS here: it is a single
+  # ext4 filesystem. Addressed by UUID because Proxmox attaches it as scsi1
+  # but Linux enumerates it first, so it is /dev/sda one boot and /dev/sdb the
+  # next (see the GRUB note below). This entry used to be commented out, and
+  # every cold boot came up with /mnt/zfs empty while nfs-server exported the
+  # empty directory, so Plex scanned an empty library -- twice. nofail keeps
+  # the host bootable if the disk is ever missing; nfs-server is tied to the
+  # mount below so it fails loudly instead of exporting nothing.
+  fileSystems."/mnt/zfs" = {
+    device = "/dev/disk/by-uuid/5cd8b6f4-bfef-4840-b1f1-47ea7bab3ab9";
+    fsType = "ext4";
+    options = [ "nofail" ];
+  };
+  systemd.services.nfs-server = {
+    requires = [ "mnt-zfs.mount" ];
+    after = [ "mnt-zfs.mount" ];
+  };
   boot.loader.grub.enable = true;
   # Address the OS disk by its stable by-id path, never by /dev/sdX. Proxmox
   # attaches the 150G system disk as drive-scsi0 and the 34T ZFS pool as
@@ -101,13 +108,6 @@
       inherit inputs;
       headless = false;
     };
-  };
-
-  nix = {
-    # From flake-utils-plus
-    generateNixPathFromInputs = true;
-    generateRegistryFromInputs = true;
-    linkInputs = true;
   };
 
   # Configure keymap in X11

@@ -2,10 +2,7 @@
   services.xserver.enable = true;
   services.desktopManager.gnome.enable = true;
 
-  services.displayManager.gdm = {
-    enable = true;
-    wayland = true;
-  };
+  services.displayManager.gdm.enable = true;
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";

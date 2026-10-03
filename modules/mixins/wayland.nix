@@ -3,10 +3,7 @@
     enable = true;
     desktopManager.wallpaper.mode = "fill";
   };
-  services.displayManager.gdm = {
-    enable = true;
-    wayland = true;
-  };
+  services.displayManager.gdm.enable = true;
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;

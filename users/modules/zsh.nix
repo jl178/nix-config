@@ -2,8 +2,19 @@
 
 {
   home = { packages = with pkgs; [ zsh ]; };
+  # Per-project dev shells that load on `cd`. With an `.envrc` containing
+  # `use flake`, direnv enters that project's flake devShell automatically;
+  # nix-direnv caches the evaluation and roots it against garbage collection,
+  # so it is instant after the first time and survives `nh clean`.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
   programs.zsh = {
     enable = true;
+    # Keep the dotfiles in $HOME. Home Manager 26.05 moves the default to
+    # ~/.config/zsh for new stateVersions; pinned so it cannot shift later.
+    dotDir = config.home.homeDirectory;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     shellAliases = {

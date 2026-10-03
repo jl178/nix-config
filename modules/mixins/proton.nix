@@ -17,7 +17,7 @@
     # VPN. Logs in with Proton *account* credentials. The OpenVPN/IKEv2
     # username and password shown in the account portal are a separate
     # credential set, only for third-party clients, and are not used here.
-    protonvpn-gui
+    proton-vpn
     # Required alongside it: the app negotiates WireGuard through the kernel
     # rather than shipping a userspace implementation.
     wireguard-tools

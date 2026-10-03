@@ -420,7 +420,7 @@
             on-click = "${vpnToggle}";
             # Right-click opens the Proton app, for picking a server other
             # than the one this tunnel is pinned to.
-            on-click-right = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.protonvpn-gui}/bin/protonvpn-app";
+            on-click-right = "${pkgs.procps}/bin/pgrep -f protonvpn-app > /dev/null || ${pkgs.proton-vpn}/bin/protonvpn-app";
           };
 
           "custom/latency" = {

@@ -13,6 +13,10 @@
         wayland.windowManager.hyprland = {
           enable = true;
           xwayland.enable = true;
+          # Home Manager 26.05 changed the default config format to Lua. The
+          # config below is hyprlang, so say so rather than rely on the legacy
+          # default that only holds while home.stateVersion is old.
+          configType = "hyprlang";
 
           extraConfig = ''
             monitor=,preferred,auto,1

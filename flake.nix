@@ -1,7 +1,7 @@
 {
   description = "NixOS configuration";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     # Freshness pin for individual packages (e.g. ollama-cuda on oryp11)
     # that need a newer revision than the stable channel ships.
     nixpkgs-latest.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -10,20 +10,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
-      url = "github:nix-community/nixvim/nixos-25.11";
+      url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    utils.url = "github:gytis-ivaskevicius/flake-utils-plus";
     darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # AeroThemePlasma (Windows 7 look for KDE Plasma 6). Its flake requires
@@ -35,7 +34,7 @@
   };
 
   outputs = { self, nixpkgs, nixpkgs-latest, nixos-wsl, nixvim
-    , home-manager, agenix, darwin, utils, aerothemeplasma-nix, ... }@inputs:
+    , home-manager, agenix, darwin, aerothemeplasma-nix, ... }@inputs:
     let
       # Systems the dev container image can be built for. Note that building an
       # aarch64-linux image from aarch64-darwin needs a Linux builder
@@ -65,7 +64,6 @@
           system = "x86_64-linux";
           modules = [
             ./hosts/oryp11/configuration.nix
-            utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
             nixvim.nixosModules.nixvim
@@ -76,7 +74,6 @@
           system = "x86_64-linux";
           modules = [
             ./hosts/proxmox/media/configuration.nix
-            utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
             nixvim.nixosModules.nixvim
@@ -87,7 +84,6 @@
           system = "x86_64-linux";
           modules = [
             ./hosts/media_serving/configuration.nix
-            utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
             nixvim.nixosModules.nixvim
@@ -98,7 +94,6 @@
           system = "x86_64-linux";
           modules = [
             ./hosts/wsl/configuration.nix
-            utils.nixosModules.autoGenFromInputs
             home-manager.nixosModules.home-manager
             agenix.nixosModules.age
             nixvim.nixosModules.nixvim

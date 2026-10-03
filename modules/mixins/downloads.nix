@@ -132,16 +132,12 @@ in
     openFirewall = true;
   };
 
-  # The nixpkgs recyclarr module is written against 7.x and builds its
-  # ExecStart as `recyclarr sync --app-data <dir> --config <file>`. 8.x
-  # removed --app-data ("Unknown option 'app-data'") in favour of the
-  # RECYCLARR_CONFIG_DIR environment variable, so the unit has to be
-  # rewritten to match the package we pinned above. --config is unchanged.
-  systemd.services.recyclarr = {
-    environment.RECYCLARR_CONFIG_DIR = "/var/lib/recyclarr";
-    serviceConfig.ExecStart = lib.mkForce
-      "${lib.getExe config.services.recyclarr.package} sync --config /var/lib/recyclarr/config.json";
-  };
+  # No systemd override for recyclarr any more. Through 25.11 the nixpkgs
+  # module was written against 7.x (`--app-data`, config.json) and the unit had
+  # to be rewritten by hand for 8.x. The 26.05 module targets 8.x itself: it
+  # sets RECYCLARR_CONFIG_DIR and renders the config to config.yml. Keeping the
+  # old mkForce'd ExecStart would have pointed recyclarr at the stale
+  # config.json the module no longer writes, silently freezing the config.
 
   # Proton VPN port forwarding for Deluge, over NAT-PMP.
   #
@@ -230,19 +226,25 @@ in
   #
   # Jellyseerr is the same application with Plex support intact -- the
   # Jellyfin support its description mentions is additive. Pinned to unstable
-  # for 3.4.1: stable carries 2.7.3, and while that release does contain
+  # for 3.4.1: stable carried 2.7.3 on 25.11 (26.05 has 3.2.0, which has not
+  # been checked against the regression below), and while 2.7.3 does contain
   # "update Plex Watchlist URL", there is a later regression
   # (seerr-team/seerr#2369) whose fix landed after it. 3.4.1 is the newest
   # release and the best chance of a working watchlist; if it still fails,
   # the fix is on develop and this is not solvable from nixpkgs yet.
-  services.jellyseerr = {
+  #
+  # 26.05 renamed services.jellyseerr to services.seerr, following upstream,
+  # and the unit with it: it is now seerr.service. State stays where it was,
+  # /var/lib/jellyseerr/config, because this host's stateVersion predates
+  # 26.05 and the module keeps the legacy path in that case.
+  services.seerr = {
     enable = true;
     openFirewall = true;
     port = 5056;
     package = (import inputs.nixpkgs-latest {
       inherit (pkgs.stdenv.hostPlatform) system;
       config.allowUnfree = true;
-    }).jellyseerr;
+    }).seerr;
   };
 
   # Recyclarr: syncs TRaSH Guides quality profiles, custom formats and their
@@ -281,12 +283,8 @@ in
   services.recyclarr = {
     enable = true;
     schedule = "daily";
-    # Stable is 7.4.1, which expects an includes.json the guides repo no
-    # longer ships and dies on startup. 8.x reads the current layout.
-    package = (import inputs.nixpkgs-latest {
-      inherit (pkgs.stdenv.hostPlatform) system;
-      config.allowUnfree = true;
-    }).recyclarr;
+    # No package pin: 26.05 stable ships 8.x. (25.11 had 7.4.1, which expected
+    # an includes.json the guides repo no longer ships and died on startup.)
     # Named-style instances: the attribute name IS the instance name. The
     # array style shown in the upstream nixpkgs example was dropped in v5 and
     # is rejected at runtime with "Found array-style list of instances".
@@ -333,13 +331,13 @@ in
             # watchers want subs. This house wants dubs, so a dub-only
             # release is desirable rather than disqualifying.
             trash_ids = [ "9c14d194486c4014d422adc64092d794" ];
-            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 200; }];
+            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 1800; }];
           }
           {
             # Anime Dual Audio. Best of both - English dub plus the original
             # track and subtitles - so score it above dub-only.
             trash_ids = [ "418f50b10f1907201b6cfdf881f467b7" ];
-            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 500; }];
+            assign_scores_to = [{ name = "[Anime] Remux-1080p"; score = 2000; }];
           }
         ];
         quality_profiles = [
@@ -360,11 +358,18 @@ in
           # below Series profile minimum 100" among the reasons. Junk is still
           # rejected, because that works through NEGATIVE scores (LQ, BR-DISK,
           # Anime LQ Groups at -10000), which are unaffected by this floor.
-          {
-            trash_id = "20e0fc959f1f1704bed501f23bdae76f";
-            reset_unmatched_scores.enabled = true;
-            min_format_score = 0;
-          }
+          # NOTE: the [Anime] Remux-1080p profile is deliberately NOT listed
+          # here. Listing it makes recyclarr own the profile's quality
+          # structure, and it resets two things we need every time it runs:
+          # WEB 1080p must outrank Bluray 1080p (Sonarr ranks quality tier
+          # before custom-format score, so otherwise a Japanese Bluray beats
+          # an English WEB-DL and the dub scores never apply), and
+          # Bluray-1080p Remux must stay disallowed (8.6 GB/episode).
+          # Expressing that here via `qualities:` crashes recyclarr 8.6.0
+          # ("Offset and length were out of bounds"), so the profile's
+          # qualities are managed by hand in Sonarr instead. Scores still
+          # come from custom_formats.assign_scores_to above, which works by
+          # profile name and does not require an entry here.
         ];
       };
       radarr.movies = {

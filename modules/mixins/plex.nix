@@ -15,7 +15,14 @@ let
 in {
   services.plex = {
     enable = true;
-    package = inputs.nixpkgs-latest.legacyPackages.${pkgs.system}.plex;
+    # Instantiate nixpkgs-latest explicitly rather than reaching into
+    # legacyPackages: that is a bare import with the default config, so it
+    # ignores nixpkgs.config.allowUnfree and Plex (unfree) refused to evaluate,
+    # which failed the whole host. Same shape as ollama-cuda on oryp11.
+    package = (import inputs.nixpkgs-latest {
+      inherit (pkgs.stdenv.hostPlatform) system;
+      config.allowUnfree = true;
+    }).plex;
     dataDir = "/var/lib/plexmediaserver/";
     openFirewall = false;
     extraPlugins = [
