@@ -33,8 +33,15 @@
       publicKey = "8CVVG06hMdML0jNHYABstFHtFTE4pv8hEG46bqXdj1k=";
       endpoint = "149.28.249.116:51820";
       allowedIPs = [ "10.9.0.1/32" ];
-      persistentKeepalive = 25;
+      persistentKeepalive = 10; # was 25; Starlink CGNAT recovers faster (2026-10-26)
     }];
+  };
+
+  # TCP BBR congestion control: holds throughput through Starlink's random packet
+  # loss, where CUBIC halves its window on every drop (remote Plex stalls, 2026-10-26).
+  boot.kernelModules = [ "tcp_bbr" ];
+  boot.kernel.sysctl = {
+    "net.ipv4.tcp_congestion_control" = "bbr";
   };
 
   networking.firewall.allowedTCPPorts = [ 32400 ];
